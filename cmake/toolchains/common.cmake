@@ -1,2 +1,0 @@
-set(CMAKE_C_FLAGS "-O2 -fPIC")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")

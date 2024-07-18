@@ -1,10 +1,2 @@
 package = simd
 headers = public/lib.h
-
-linkerOpts = -lsimd
-linkerOpts.linux_x64 = -Lbuild/cmake/simd/linuxX64
-linkerOpts.linux_arm64 = -Lbuild/cmake/simd/linuxArm64
-linkerOpts.macos_x64 = -Lbuild/cmake/simd/macosX64
-linkerOpts.macos_arm64 = -Lbuild/cmake/simd/macosArm64
-linkerOpts.windows_x64 = -Lbuild/cmake/simd/windowsX64
-# linkerOpts.windows_arm64 = -Lbuild/cmake/simd/windowsArm64

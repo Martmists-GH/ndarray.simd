@@ -5,6 +5,3 @@
 .gradle/
 .kotlin/
 build/
-
-### CMake
-cmake-build-*/
