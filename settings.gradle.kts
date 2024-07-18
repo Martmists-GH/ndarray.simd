@@ -1,9 +1,1 @@
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        google()
-    }
-}
-
-rootProject.name = "kt-ndarray-simd"
-
+rootProject.name = "ndarray-simd"

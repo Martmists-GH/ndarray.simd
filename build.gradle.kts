@@ -1,10 +1,5 @@
-import com.github.tomtzook.gcmake.tasks.CmakeBuildTask
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
-import org.jetbrains.kotlin.gradle.targets.native.tasks.artifact.KotlinNativeLinkArtifactTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 
 plugins {
     kotlin("multiplatform") version "2.0.0"
