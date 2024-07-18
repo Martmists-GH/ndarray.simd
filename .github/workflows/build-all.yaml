@@ -14,23 +14,30 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
 
-      - uses: actions/setup-java@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
         with:
           java-version: '21'
           distribution: 'adopt'
           cache: 'gradle'
 
-      - uses: actions/cache@v3
+      - name: Set up caching
+        uses: actions/cache@v3
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan
 
-      - uses: gradle/gradle-build-action@v2
+      - name: Gradle Build
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: -Pproduction=true build
 
-      - uses: gradle/gradle-build-action@v2
+      - name: Gradle Publish
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: -Pproduction=true publish
