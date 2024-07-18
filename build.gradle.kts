@@ -46,17 +46,20 @@ cmake {
                 targetMachines.add(macosX64)
                 targetMachines.add(macosArm64)
             } else {
-                val hostMachine = when (val osArch = System.getProperty("os.arch")) {
-                    "amd64", "x86_64" -> when (val osName = System.getProperty("os.name")) {
-                        "Linux" -> linuxX64
-                        "Windows" -> mingwX64
-                        "Mac OS X" -> macosX64
+                val osName = System.getProperty("os.name")
+                val osArch = System.getProperty("os.arch")
+
+                val hostMachine = when (osArch) {
+                    "amd64", "x86_64" -> when {
+                        osName.startsWith("Linux") -> linuxX64
+                        osName.startsWith("Windows") -> mingwX64
+                        osName.startsWith("Mac OS X") -> macosX64
                         else -> error("Unsupported OS: $osName")
                     }
-                    "arm64", "aarch64" -> when (val osName = System.getProperty("os.name")) {
-                        "Linux" -> linuxArm64
-                        "Windows" -> error("Unsupported OS: Windows on ARM")
-                        "Mac OS X" -> macosArm64
+                    "arm64", "aarch64" -> when {
+                        osName.startsWith("Linux") -> linuxArm64
+                        osName.startsWith("Windows") -> error("Unsupported OS: Windows on ARM")
+                        osName.startsWith("Mac OS X") -> macosArm64
                         else -> error("Unsupported OS: $osName")
                     }
                     else -> error("Unsupported architecture: $osArch")
