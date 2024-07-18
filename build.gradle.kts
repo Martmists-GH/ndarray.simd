@@ -80,7 +80,7 @@ kotlin {
                     extraOpts("-Xsource-compiler-option", "-O2")
 
                     if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-isystem /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include")
+                        extraOpts("-Xsource-compiler-option", "-isystem /Library/Developer/CommandLineTools/usr/lib/clang/11.0.0/include")
                         extraOpts("-Xsource-compiler-option", "-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
                     }
 
