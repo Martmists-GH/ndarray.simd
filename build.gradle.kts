@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 plugins {
     kotlin("multiplatform") version "2.0.0"
     id("io.github.tomtzook.gradle-cmake") version "1.2.2"
+    publishing
 }
 
 group = "com.martmists"
@@ -50,7 +51,23 @@ cmake {
                 targetMachines.add(macosX64)
                 targetMachines.add(macosArm64)
             } else {
-                targetMachines.add(linuxX64)
+                val hostMachine = when (val osArch = System.getProperty("os.arch")) {
+                    "amd64", "x86_64" -> when (val osName = System.getProperty("os.name")) {
+                        "Linux" -> linuxX64
+                        "Windows" -> mingwX64
+                        "Mac OS X" -> macosX64
+                        else -> error("Unsupported OS: $osName")
+                    }
+                    "arm64", "aarch64" -> when (val osName = System.getProperty("os.name")) {
+                        "Linux" -> linuxArm64
+                        "Windows" -> error("Unsupported OS: Windows on ARM")
+                        "Mac OS X" -> macosArm64
+                        else -> error("Unsupported OS: $osName")
+                    }
+                    else -> error("Unsupported architecture: $osArch")
+                }
+
+                targetMachines.add(hostMachine)
             }
 
             cmakeArgs = if (project.hasProperty("production")) {
@@ -75,11 +92,20 @@ kotlin {
             macosArm64(),
         )
     } else {
-        when (System.getProperty("os.name")) {
-            "Linux" -> listOf(linuxX64())
-            "Windows" -> listOf(mingwX64())
-            "Mac OS X" -> listOf(macosX64())
-            else -> error("Unsupported OS")
+        when (val osArch = System.getProperty("os.arch")) {
+            "amd64", "x86_64" -> when (val osName = System.getProperty("os.name")) {
+                "Linux" -> listOf(linuxX64())
+                "Windows" -> listOf(mingwX64())
+                "Mac OS X" -> listOf(macosX64())
+                else -> error("Unsupported OS: $osName")
+            }
+            "arm64", "aarch64" -> when (val osName = System.getProperty("os.name")) {
+                "Linux" -> listOf(linuxArm64())
+                "Windows" -> error("Unsupported OS: Windows on ARM")
+                "Mac OS X" -> listOf(macosArm64())
+                else -> error("Unsupported OS: $osName")
+            }
+            else -> error("Unsupported architecture: $osArch")
         }
     }
 
@@ -143,6 +169,34 @@ tasks {
                     exclude("**/*.h")
                 }
             }
+        }
+    }
+}
+
+if (project.hasProperty("production")) {
+    val isTagged = Runtime.getRuntime().exec("git tag --points-at HEAD").inputStream.readAllBytes().decodeToString().isNotBlank()
+
+    val releaseVersion = if (isTagged) {
+        version.toString()
+    } else {
+        val tag = Runtime.getRuntime().exec("git rev-parse --short HEAD").inputStream.readAllBytes().decodeToString().trim()
+        "$version-$tag"
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name = "Martmists Maven"
+                url = uri("https://maven.martmists.com/${if (isTagged) "releases" else "snapshots"}")
+                credentials {
+                    username = "admin"
+                    password = project.ext["mavenToken"] as? String ?: System.getenv("MAVEN_TOKEN") ?: error("No maven token found")
+                }
+            }
+        }
+
+        publications.withType<MavenPublication> {
+            version = releaseVersion
         }
     }
 }
