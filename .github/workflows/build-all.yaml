@@ -34,7 +34,7 @@ jobs:
 
       - if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-arm-latest'
         run: |
-          apt-get install xsimd
+          sudo apt-get install xsimd
 
       - if: matrix.os == 'macos-latest' || matrix.os == 'macos-arm-latest'
         run: |
