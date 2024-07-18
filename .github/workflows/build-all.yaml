@@ -32,6 +32,14 @@ jobs:
           path: ~/.konan
           key: ${{ runner.os }}-konan
 
+      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-arm-latest'
+        run: |
+          apt-get install xsimd
+
+      - if: matrix.os == 'macos-latest' || matrix.os == 'macos-arm-latest'
+        run: |
+          brew install xsimd
+
       - uses: gradle/gradle-build-action@v2
         with:
           arguments: cmakeBuild
