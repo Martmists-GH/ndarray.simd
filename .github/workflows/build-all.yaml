@@ -1,0 +1,65 @@
+name: Build All
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+
+jobs:
+  build-cmake:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-arm-latest, windows-latest, macos-latest, macos-arm-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+          cache: 'gradle'
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: cmakeBuild
+
+  build:
+    needs: build-cmake
+
+    runs-on: macos-latest
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Pproduction=true build
+
+  release:
+    needs: build
+
+    runs-on: macos-latest
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan
+
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -Pproduction=true publish
