@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.martmists"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -129,7 +129,11 @@ if (project.hasProperty("production")) {
                 url = uri("https://maven.martmists.com/${if (isTagged) "releases" else "snapshots"}")
                 credentials {
                     username = "admin"
-                    password = project.ext["mavenToken"] as? String ?: System.getenv("MAVEN_TOKEN") ?: error("No maven token found")
+                    password = if (project.hasProperty("mavenToken")) {
+                        project.ext["mavenToken"] as? String
+                    } else {
+                        System.getenv("MAVEN_TOKEN")
+                    } ?: error("No maven token found")
                 }
             }
         }
