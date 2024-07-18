@@ -1,0 +1,4 @@
+package = simd
+headers = public/lib.h
+
+linkerOpts.linux_x64 = -Lbuild/cmake/simd/linuxX64 -lsimd

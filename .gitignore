@@ -1,0 +1,10 @@
+### IDE
+.idea/
+
+### Gradle
+.gradle/
+.kotlin/
+build/
+
+### CMake
+cmake-build-*/
