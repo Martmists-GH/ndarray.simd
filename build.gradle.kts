@@ -80,8 +80,8 @@ kotlin {
                     extraOpts("-Xsource-compiler-option", "-O2")
 
                     if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-isystem /opt/homebrew/include")
-                        extraOpts("-Xsource-compiler-option", "-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk")
+                        extraOpts("-Xsource-compiler-option", "-isystem /Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include")
+                        extraOpts("-Xsource-compiler-option", "-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
                     }
 
                     val cppSource = projectDir.resolve("src/lib/cpp").listFiles().filter { it.extension == "cpp" }.map { it.absolutePath }
