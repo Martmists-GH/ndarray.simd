@@ -125,7 +125,7 @@ if (project.hasProperty("production")) {
     publishing {
         repositories {
             maven {
-                name = "Martmists Maven"
+                name = "Martmists-Maven"
                 url = uri("https://maven.martmists.com/${if (isTagged) "releases" else "snapshots"}")
                 credentials {
                     username = "admin"
