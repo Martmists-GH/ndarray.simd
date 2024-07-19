@@ -4,7 +4,15 @@ A Kotlin NDArray library with built-in SIMD support.
 
 ### Installation
 
-Coming soon:tm: to my Maven repo.
+```kotlin
+repositories {
+    maven("https://maven.martmists.com/releases")
+}
+
+dependencies {
+    implementation("com.martmists.ndarray-simd:ndarray-simd:0.0.1")
+}
+```
 
 ### Motivation
 
