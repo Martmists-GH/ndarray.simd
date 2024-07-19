@@ -99,7 +99,7 @@ tasks {
     withType<KotlinNativeCompile> {
         compilerOptions {
             if (!target.startsWith("mingw")) {
-                freeCompilerArgs.add("-Xbinary=sourceinfoType=libbacktrace")
+                freeCompilerArgs.add("-Xbinary=sourceInfoType=libbacktrace")
             }
 
             optIn = listOf(
