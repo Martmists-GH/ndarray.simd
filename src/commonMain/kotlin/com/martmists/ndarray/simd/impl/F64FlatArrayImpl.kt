@@ -51,6 +51,22 @@ internal open class F64FlatArrayImpl internal constructor(
 
     override fun copy(): F64FlatArray = F64FlatArray.create(toDoubleArray(), 0, length)
 
+    override fun reshape(vararg shape: Int): F64Array {
+        shape.forEach { require(it > 0) { "shape must be positive but was $it" } }
+        check(shape.product() == length) { "total size of the new array must be unchanged" }
+        return when {
+            this.shape.contentEquals(shape) -> this
+            else -> {
+                val reshaped = shape.copyOf()
+                reshaped[reshaped.lastIndex] = strides.single()
+                for (i in reshaped.lastIndex - 1 downTo 0) {
+                    reshaped[i] = reshaped[i + 1] * shape[i + 1]
+                }
+                F64Array.create(data, offset, reshaped, shape)
+            }
+        }
+    }
+
     override fun slice(from: Int, to: Int, step: Int, axis: Int): F64FlatArray = super.slice(from, to, step, axis) as F64FlatArray
 
     override fun fill(init: Double) {
