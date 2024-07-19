@@ -45,8 +45,6 @@ internal open class F64FlatArrayImpl internal constructor(
         val o = checkShape(other)
         o as F64FlatArrayImpl
 
-        println("Copying $this to $o")
-
         for (pos in 0 until length) {
             o.unsafeSet(pos, unsafeGet(pos))
         }
@@ -155,8 +153,6 @@ internal open class F64FlatArrayImpl internal constructor(
     }
 
     override fun transformInPlace(transform: (Double) -> Double) {
-        println("transformInPlace: $offset $length ${strides[0]}")
-
         for (pos in 0 until length) {
             unsafeSet(pos, transform.invoke(unsafeGet(pos)))
         }
@@ -275,10 +271,7 @@ internal open class F64FlatArrayImpl internal constructor(
         }
         else -> {
             val sb = StringBuilder()
-            if (this < 0) {
-                sb.append('-')
-            }
-            sb.append(truncate(this).toString())
+            sb.append(truncate(this).toString().dropLast(2))
             val decimal = abs(this - truncate(this))
             if (decimal > 0) {
                 sb.append('.')

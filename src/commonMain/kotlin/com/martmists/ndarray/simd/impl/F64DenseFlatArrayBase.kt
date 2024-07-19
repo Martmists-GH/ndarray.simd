@@ -47,7 +47,7 @@ internal abstract class F64DenseFlatArrayBase(
             dst[i] = transform(data[srcOffset])
             srcOffset++
         }
-        return F64FlatArray.create(dst, 0, length)
+        return F64FlatArray.create(dst)
     }
 
     override fun zipTransformInPlace(other: F64Array, transform: (Double, Double) -> Double) {
