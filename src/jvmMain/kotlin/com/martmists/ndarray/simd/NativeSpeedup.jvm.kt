@@ -5,10 +5,10 @@ import java.io.File
 internal actual object NativeSpeedup {
     init {
         val osName = System.getProperty("os.name")
-        val platform = when {
-            osName.startsWith("Linux") -> "linux"
-            osName.startsWith("Mac") -> "macos"
-            osName.startsWith("Windows") -> "windows"
+        val (platform, filename) = when {
+            osName.startsWith("Linux") -> "linux" to "libndarray_simd.so"
+            osName.startsWith("Mac") -> "macos" to "libndarray_simd.dylib"
+            osName.startsWith("Windows") -> "windows" to "ndarray_simd.dll"
             else -> throw UnsupportedOperationException("Unsupported platform: $osName")
         }
         val arch = when (val osArch = System.getProperty("os.arch")) {
@@ -17,10 +17,10 @@ internal actual object NativeSpeedup {
             else -> throw UnsupportedOperationException("Unsupported architecture: $osArch")
         }
 
-        val tmp = File.createTempFile("libndarray_simd", ".so")
+        val tmp = File.createTempFile("ndarray_simd", suffix = ".${filename.substringAfterLast('.')}")
         tmp.deleteOnExit()
 
-        val lib = NativeSpeedup::class.java.getResourceAsStream("/META-INF/natives/$platform$arch/libndarray_simd.so")!!
+        val lib = NativeSpeedup::class.java.getResourceAsStream("/META-INF/natives/$platform$arch/$filename")!!
         lib.copyTo(tmp.outputStream())
 
         System.load(tmp.absolutePath)
