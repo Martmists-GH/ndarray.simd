@@ -87,7 +87,7 @@ kotlin {
                     }
 
                     if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/llvm-11.1.0-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials")
+                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/llvm-11.1.0-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include")
                         extraOpts("-Xsource-compiler-option", "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
                     }
 
