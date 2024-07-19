@@ -284,6 +284,15 @@ interface F64Array {
             }
             return result
         }
+        @JvmStatic
+        fun diagonal(values: F64Array): F64Array {
+            val n = values.length
+            val result = zeros(intArrayOf(n, n))
+            for (i in 0 until n) {
+                result[i, i] = values[i]
+            }
+            return result
+        }
 
         @JvmStatic
         fun zeros(vararg shape: Int): F64Array = full(shape, 0.0)
