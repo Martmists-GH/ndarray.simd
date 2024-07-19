@@ -75,9 +75,9 @@ kotlin {
 
                     if (target.name.startsWith("macos")) {
                         extraOpts("-Xsource-compiler-option", "-v")
-                        extraOpts("-Xsource-compiler-option", "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/")
-                        extraOpts("-Xsource-compiler-option", "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/")
-                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/")
+                        extraOpts("-Xsource-compiler-option", "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/")
+                        extraOpts("-Xsource-compiler-option", "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/")
+                        extraOpts("-Xsource-compiler-option", "-I~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/")
                     }
 
                     val cppSource = projectDir.resolve("src/lib/cpp").listFiles().filter { it.extension == "cpp" }.map { it.absolutePath }
