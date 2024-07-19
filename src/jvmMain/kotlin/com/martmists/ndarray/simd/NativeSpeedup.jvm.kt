@@ -17,7 +17,7 @@ internal actual object NativeSpeedup {
             else -> throw UnsupportedOperationException("Unsupported architecture: $osArch")
         }
 
-        val tmp = File.createTempFile("ndarray_simd", suffix = ".${filename.substringAfterLast('.')}")
+        val tmp = File.createTempFile("ndarray_simd", ".${filename.substringAfterLast('.')}")
         tmp.deleteOnExit()
 
         val lib = NativeSpeedup::class.java.getResourceAsStream("/META-INF/natives/$platform$arch/$filename")!!
