@@ -51,6 +51,8 @@ internal open class F64FlatArrayImpl internal constructor(
 
     override fun copy(): F64FlatArray = F64FlatArray.create(toDoubleArray(), 0, length)
 
+    override fun slice(from: Int, to: Int, step: Int, axis: Int): F64FlatArray = super.slice(from, to, step, axis) as F64FlatArray
+
     override fun fill(init: Double) {
         for (pos in 0 until length) {
             unsafeSet(pos, init)
