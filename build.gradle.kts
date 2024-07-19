@@ -1,5 +1,6 @@
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+import org.jetbrains.kotlin.compilerRunner.konanHome
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") version "2.0.0"
@@ -79,10 +80,22 @@ kotlin {
                     extraOpts("-Xsource-compiler-option", "-std=c++20")
                     extraOpts("-Xsource-compiler-option", "-O2")
 
+                    if (File("~/.konan/dependencies").exists()) {
+                        for (file in File("~/.konan/dependencies").listFiles()!!) {
+                            println(file)
+                        }
+                    }
+
                     if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-isystem/Library/Developer/CommandLineTools/usr/lib/clang/15.0.0/include")
+                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/llvm-11.1.0-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials")
                         extraOpts("-Xsource-compiler-option", "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
                     }
+
+                    @Suppress("INVISIBLE_MEMBER")
+                    println(konanHome)
+
+                    println(target.konanTarget)
+                    println(target.konanTarget.visibleName)
 
                     val cppSource = projectDir.resolve("src/lib/cpp").listFiles().filter { it.extension == "cpp" }.map { it.absolutePath }
                     cppSource.forEach {
