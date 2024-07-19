@@ -1,14 +1,14 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") version "2.0.0"
-    publishing
+    `maven-publish`
 }
 
-group = "com.martmists"
+group = "com.martmists.ndarray-simd"
 version = "1.0.0"
+val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
 kotlin {
     jvm()
 
-    val natives = if (project.hasProperty("production")) {
+    val natives = if (isProduction) {
         listOf(
             linuxX64(),
             linuxArm64(),
@@ -110,7 +110,7 @@ tasks {
     }
 
     val jvmProcessResources by existing(Copy::class) {
-        val binaryName = if (project.hasProperty("production")) {
+        val binaryName = if (isProduction) {
             "releaseShared"
         } else {
             "debugShared"
@@ -126,7 +126,7 @@ tasks {
     }
 }
 
-if (project.hasProperty("production")) {
+if (isProduction) {
     val isTagged = Runtime.getRuntime().exec("git tag --points-at HEAD").inputStream.reader().readText().isNotBlank()
 
     val releaseVersion = if (isTagged) {
@@ -142,7 +142,11 @@ if (project.hasProperty("production")) {
                 name = "Martmists-Maven"
                 url = uri("https://maven.martmists.com/${if (isTagged) "releases" else "snapshots"}")
                 credentials {
-                    username = "admin"
+                    username = if (project.hasProperty("mavenToken")) {
+                        "admin"
+                    } else {
+                        System.getenv("MAVEN_USER")
+                    } ?: error("No maven user found")
                     password = if (project.hasProperty("mavenToken")) {
                         project.ext["mavenToken"] as? String
                     } else {
@@ -152,8 +156,10 @@ if (project.hasProperty("production")) {
             }
         }
 
-        publications.withType<MavenPublication> {
-            version = releaseVersion
+        publications {
+            withType<MavenPublication> {
+                version = releaseVersion
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ on:
 
 env:
   MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+  MAVEN_USER: ${{ secrets.MAVEN_USER }}
 
 jobs:
   build:
