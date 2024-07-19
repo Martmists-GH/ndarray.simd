@@ -1,4 +1,6 @@
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
     kotlin("multiplatform") version "2.0.0"
@@ -50,13 +52,6 @@ kotlin {
                 }
             }
 
-            compilerOptions {
-                optIn = listOf(
-                    "kotlin.experimental.ExperimentalNativeApi",
-                    "kotlinx.cinterop.ExperimentalForeignApi",
-                )
-            }
-
             compilations.named("main") {
                 val jni by cinterops.creating {
                     val javaHome = File(System.getProperty("java.home")!!)
@@ -78,15 +73,11 @@ kotlin {
                     extraOpts("-Xsource-compiler-option", "-std=c++20")
                     extraOpts("-Xsource-compiler-option", "-O2")
 
-                    if (File("~/.konan/dependencies").exists()) {
-                        for (file in File("~/.konan/dependencies").listFiles()!!) {
-                            println(file)
-                        }
-                    }
-
                     if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include")
-                        extraOpts("-Xsource-compiler-option", "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
+                        extraOpts("-Xsource-compiler-option", "-v")
+                        extraOpts("-Xsource-compiler-option", "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/")
+                        extraOpts("-Xsource-compiler-option", "-isystem/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/")
+                        extraOpts("-Xsource-compiler-option", "-isystem~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/")
                     }
 
                     val cppSource = projectDir.resolve("src/lib/cpp").listFiles().filter { it.extension == "cpp" }.map { it.absolutePath }
@@ -105,6 +96,19 @@ kotlin {
 }
 
 tasks {
+    withType<KotlinNativeCompile> {
+        compilerOptions {
+            if (!target.startsWith("mingw")) {
+                freeCompilerArgs.add("-Xbinary=sourceinfoType=libbacktrace")
+            }
+
+            optIn = listOf(
+                "kotlin.experimental.ExperimentalNativeApi",
+                "kotlinx.cinterop.ExperimentalForeignApi",
+            )
+        }
+    }
+
     val jvmProcessResources by existing(Copy::class) {
         val binaryName = if (project.hasProperty("production")) {
             "releaseShared"
