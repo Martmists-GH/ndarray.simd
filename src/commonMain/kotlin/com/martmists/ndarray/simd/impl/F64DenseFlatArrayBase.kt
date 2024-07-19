@@ -2,6 +2,7 @@ package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
+import com.martmists.ndarray.simd.NativeSpeedup
 
 // TODO: Dense array for ND?
 internal abstract class F64DenseFlatArrayBase(
@@ -20,7 +21,7 @@ internal abstract class F64DenseFlatArrayBase(
     override fun copyTo(other: F64Array) {
         if (other is F64DenseFlatArrayBase) {
             checkShape(other)
-
+            NativeSpeedup.vecCopy(other.data, other.offset, length, data, offset)
         } else {
             super.copyTo(other)
         }

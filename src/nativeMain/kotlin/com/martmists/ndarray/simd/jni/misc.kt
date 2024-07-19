@@ -16,7 +16,7 @@ fun jni_vec_copy(env: CPointer<JNIEnvVar>, thisObject: jobject, dest: jdoubleArr
         val arrDest = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, dest, null)!!.reinterpret<DoubleVar>()
         val refDest = interpretCPointer<DoubleVar>(arrDest.rawValue + destOffset * sizeOf<DoubleVar>())
 
-        vec_copy(refSrc, refDest, destSize)
+        vec_copy(refDest, refSrc, destSize)
 
         env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, src, arrSrc, 0)
         env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, dest, arrDest, 0)

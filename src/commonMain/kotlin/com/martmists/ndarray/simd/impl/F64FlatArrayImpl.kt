@@ -44,6 +44,9 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun copyTo(other: F64Array) {
         val o = checkShape(other)
         o as F64FlatArrayImpl
+
+        println("Copying $this to $o")
+
         for (pos in 0 until length) {
             o.unsafeSet(pos, unsafeGet(pos))
         }
@@ -256,7 +259,65 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun atanhInPlace() = transformInPlace(::atanh)
     override fun hypotInPlace(other: F64Array) = zipTransformInPlace(other, ::hypot)
 
+    override fun diagonal(): F64FlatArray = unsupported()
+
     override fun toDoubleArray() = DoubleArray(length) { unsafeGet(it) }
+
+    private fun Double.format(digits: Int): String = when {
+        this.isNaN() -> {
+            "nan"
+        }
+        this == Double.POSITIVE_INFINITY -> {
+            "inf"
+        }
+        this == Double.NEGATIVE_INFINITY -> {
+            "-inf"
+        }
+        else -> {
+            val sb = StringBuilder()
+            if (this < 0) {
+                sb.append('-')
+            }
+            sb.append(truncate(this).toString())
+            val decimal = abs(this - truncate(this))
+            if (decimal > 0) {
+                sb.append('.')
+                sb.append((decimal * 10.0.pow(digits)).toInt().toString())
+            }
+            sb.toString()
+        }
+    }
+
+    override fun toString(maxDisplay: Int): String {
+        val sb = StringBuilder()
+        sb.append('[')
+
+        if (maxDisplay < length) {
+            for (pos in 0 until maxDisplay / 2) {
+                sb.append(this[pos].format(4)).append(", ")
+            }
+
+            sb.append("..., ")
+
+            val leftover = maxDisplay - maxDisplay / 2
+            for (pos in length - leftover until length) {
+                sb.append(this[pos].format(4))
+                if (pos < length - 1) {
+                    sb.append(", ")
+                }
+            }
+        } else {
+            for (pos in 0 until length) {
+                sb.append(this[pos].format(4))
+                if (pos < length - 1) {
+                    sb.append(", ")
+                }
+            }
+        }
+
+        sb.append(']')
+        return sb.toString()
+    }
 
     override fun equals(other: Any?) = when {
         this === other -> true

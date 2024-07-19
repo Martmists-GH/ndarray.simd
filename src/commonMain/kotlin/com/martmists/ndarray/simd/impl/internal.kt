@@ -2,6 +2,7 @@ package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
+import kotlin.math.min
 
 internal fun F64Array.view0(indices: IntArray): F64Array {
     require(indices.size < nDim) { "too many indices" }
@@ -33,7 +34,7 @@ internal fun F64Array.commonUnrollToFlat(
     action: (F64FlatArray, F64FlatArray) -> Unit
 ) {
     checkShape(other)
-    val commonUnrollDim = kotlin.math.min(unrollDim, other.unrollDim)
+    val commonUnrollDim = min(unrollDim, other.unrollDim)
     if (commonUnrollDim == nDim) {
         action(flatten(), other.flatten())
     } else {

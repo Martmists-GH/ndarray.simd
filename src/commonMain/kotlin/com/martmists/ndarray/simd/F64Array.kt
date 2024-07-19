@@ -2,8 +2,10 @@ package com.martmists.ndarray.simd
 
 import com.martmists.ndarray.simd.impl.create
 import com.martmists.ndarray.simd.impl.product
+import com.martmists.ndarray.simd.impl.remove
 import com.martmists.ndarray.simd.impl.unsupported
 import kotlin.jvm.JvmName
+import kotlin.jvm.JvmStatic
 import kotlin.math.*
 
 
@@ -207,19 +209,31 @@ interface F64Array {
     fun hypotInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> hypot(a, b) }
     fun hypot(other: F64Array): F64Array = copy().apply { hypotInPlace(other) }
 
+    fun diagonal(): F64FlatArray = unsupported()
+
     infix fun matmul(other: F64Array): F64Array = unsupported()
 
     fun toDoubleArray(): DoubleArray = unsupported()
 
+    fun toString(maxDisplay: Int): String = unsupported()
+
     companion object {
         val simdSize by lazy { NativeSpeedup.getSimdSize() * 2 }
 
+        @JvmStatic
+        @JvmName("create")
         operator fun invoke(vararg shape: Int) = F64FlatArray.create(DoubleArray(shape.product())).reshape(*shape)
+
+        @JvmStatic
+        @JvmName("createArray")
         operator fun invoke(size: Int, init: (Int) -> Double) = F64Array(size).apply {
             for (i in 0 until size) {
                 this[i] = init(i)
             }
         }
+
+        @JvmStatic
+        @JvmName("create2D")
         operator fun invoke(numRows: Int, numColumns: Int, init: (Int, Int) -> Double) = F64Array(numRows, numColumns).apply {
             for (r in 0 until numRows) {
                 for (c in 0 until numColumns) {
@@ -228,21 +242,40 @@ interface F64Array {
             }
         }
 
-        fun of(vararg values: Double) = F64FlatArray.of(values)
+        @JvmStatic
+        @JvmName("create3D")
+        operator fun invoke(x: Int, y: Int, z: Int, init: (Int, Int, Int) -> Double) = F64Array(x, y, z).apply {
+            for (d in 0 until x) {
+                for (r in 0 until y) {
+                    for (c in 0 until z) {
+                        this[d, r, c] = init(d, r, c)
+                    }
+                }
+            }
+        }
 
+        @JvmStatic
+        fun of(vararg values: Double) = F64FlatArray.of(values)
+        @JvmStatic
         @JvmName("ofArray")
         fun of(data: DoubleArray) = F64FlatArray.of(data)
 
+        @JvmStatic
+        fun full(vararg shape: Int, init: Double): F64Array = full(shape, init)
+        @JvmStatic
+        @JvmName("fullArray")
         fun full(shape: IntArray, init: Double): F64Array {
             return F64FlatArray.create(DoubleArray(shape.product()).apply { fill(init) }).reshape(*shape)
         }
 
+        @JvmStatic
         fun identity(n: Int): F64Array = zeros(intArrayOf(n, n)).apply {
             for (i in 0 until n) {
                 this[i, i] = 1.0
             }
         }
 
+        @JvmStatic
         fun diagonal(values: DoubleArray): F64Array {
             val n = values.size
             val result = zeros(intArrayOf(n, n))
@@ -252,7 +285,49 @@ interface F64Array {
             return result
         }
 
+        @JvmStatic
+        fun zeros(vararg shape: Int): F64Array = full(shape, 0.0)
+        @JvmStatic
+        @JvmName("zerosArray")
         fun zeros(shape: IntArray): F64Array = full(shape, 0.0)
+
+        @JvmStatic
+        fun ones(vararg shape: Int): F64Array = full(shape, 1.0)
+        @JvmStatic
+        @JvmName("onesArray")
         fun ones(shape: IntArray): F64Array = full(shape, 1.0)
+
+        @JvmStatic
+        fun ofRows(rows: List<DoubleArray>): F64Array = ofRows(rows.map { F64FlatArray.of(it) })
+        @JvmStatic
+        @JvmName("ofRowsArray")
+        fun ofRows(rows: List<F64Array>): F64Array {
+            val args = rows.map { it.reshape(1, *it.shape) }
+            return concat(args[0], *args.slice(1 until args.size).toTypedArray(), axis = 0)
+        }
+
+        @JvmStatic
+        fun concat(first: F64Array, vararg rest: F64Array, axis: Int = 0): F64Array {
+            for (other in rest) {
+                require(other.shape.remove(axis).contentEquals(first.shape.remove(axis))) {
+                    "input array shapes must be exactly equal for all dimensions except $axis"
+                }
+            }
+
+            val shape = first.shape.copyOf().apply {
+                this[axis] = first.shape[axis] + rest.sumOf { it.shape[axis] }
+            }
+
+            val result = invoke(*shape)
+            var offset = 0
+            for (a in arrayOf(first, *rest)) {
+                if (a.length > 0) {
+                    a.copyTo(result.slice(offset, offset + a.shape[axis], axis = axis))
+                    offset += a.shape[axis]
+                }
+            }
+
+            return result
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.martmists.ndarray.simd
 
 import com.martmists.ndarray.simd.impl.create
+import com.martmists.ndarray.simd.impl.unsupported
 
 /**
  * A 1D specialization type for [F64Array].
@@ -23,6 +24,7 @@ interface F64FlatArray : F64Array {
 
     fun argMin(): Int = (0 until length).minBy(::get)
     fun argMax(): Int = (0 until length).maxBy(::get)
+    fun <T> map(transform: (Double) -> T): Sequence<T> = (0 until length).asSequence().map { transform(get(it)) }
 
     override fun copy(): F64FlatArray
     override fun slice(from: Int, to: Int, step: Int, axis: Int): F64FlatArray
@@ -89,6 +91,7 @@ interface F64FlatArray : F64Array {
     override fun atanh(): F64FlatArray = copy().apply { atanhInPlace() }
     override fun hypot(other: F64Array): F64FlatArray = copy().apply { hypotInPlace(other) }
 
+    override fun diagonal(): F64FlatArray = unsupported()
 
     companion object {
         fun of(data: DoubleArray): F64FlatArray = F64FlatArray.create(data)

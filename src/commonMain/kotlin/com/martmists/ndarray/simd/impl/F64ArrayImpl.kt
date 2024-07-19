@@ -423,6 +423,47 @@ internal open class F64ArrayImpl internal constructor(
         return result
     }
 
+    override fun diagonal(): F64FlatArray {
+        check(nDim == 2) { "Only 2D arrays are supported" }
+        check(shape[0] == shape[1]) { "Only square matrices are supported" }
+
+        return F64FlatArray.create(data, offset, strides[0] + strides[1], shape[0])
+    }
+
+    override fun toString(
+        maxDisplay: Int,
+    ): String {
+        val sb = StringBuilder()
+        sb.append('[')
+        if (maxDisplay < length) {
+            for (r in 0 until maxDisplay / 2) {
+                sb.append(V[r].toString(maxDisplay)).append(", ")
+            }
+
+            sb.append("..., ")
+
+            val leftover = maxDisplay - maxDisplay / 2
+            for (r in length - leftover until length) {
+                sb.append(V[r].toString(maxDisplay))
+                if (r < length - 1) {
+                    sb.append(", ")
+                }
+            }
+        } else {
+            for (r in 0 until length) {
+                sb.append(V[r].toString(maxDisplay))
+                if (r < length - 1) {
+                    sb.append(", ")
+                }
+            }
+        }
+
+        sb.append(']')
+        return sb.toString()
+    }
+
+    override fun toString() = toString(8)
+
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is F64Array -> false
