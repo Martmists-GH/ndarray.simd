@@ -50,7 +50,7 @@ internal open class F64FlatArrayImpl internal constructor(
         }
     }
 
-    override fun copy(): F64FlatArray = F64FlatArray.create(toDoubleArray(), 0, length)
+    override fun copy(): F64FlatArray = F64FlatArray.create(toDoubleArray())
 
     override fun reshape(vararg shape: Int): F64Array {
         shape.forEach { require(it > 0) { "shape must be positive but was $it" } }
@@ -181,7 +181,7 @@ internal open class F64FlatArrayImpl internal constructor(
         for (pos in 0 until length) {
             res[pos] = transform.invoke(unsafeGet(pos), o.unsafeGet(pos))
         }
-        return F64FlatArray.create(res, 0, length)
+        return F64FlatArray.create(res)
     }
 
     override fun <T> fold(initial: T, operation: (T, Double) -> T): T {

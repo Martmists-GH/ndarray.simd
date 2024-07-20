@@ -15,7 +15,7 @@ internal abstract class F64DenseFlatArrayBase(
     override fun copy(): F64FlatArray {
         val copyData = DoubleArray(length)
         data.copyInto(copyData, 0, offset, offset + length)
-        return F64FlatArray.create(copyData, 0)
+        return F64FlatArray.create(copyData)
     }
 
     override fun copyTo(other: F64Array) {
@@ -91,7 +91,7 @@ internal abstract class F64DenseFlatArrayBase(
                     otherOffset++
                 }
             }
-            return F64FlatArray.create(dst, 0, length)
+            return F64FlatArray.create(dst)
         } else {
             return super.zipTransform(other, transform)
         }
