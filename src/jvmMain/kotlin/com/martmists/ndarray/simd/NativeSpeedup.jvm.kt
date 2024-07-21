@@ -55,8 +55,12 @@ internal actual object NativeSpeedup {
     actual external fun vecNeqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     actual external fun vecLtVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     actual external fun vecLtScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    actual external fun vecLteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    actual external fun vecLteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     actual external fun vecGtVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     actual external fun vecGtScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    actual external fun vecGteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    actual external fun vecGteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
 
     actual external fun vecSqrt(a: DoubleArray, aOffset: Int, aSize: Int)
     actual external fun vecPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)

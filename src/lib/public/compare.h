@@ -12,6 +12,10 @@ void vec_lt_vec(double* arr, double* b, int n);
 void vec_lt_scalar(double* arr, double b, int n);
 void vec_gt_vec(double* arr, double* b, int n);
 void vec_gt_scalar(double* arr, double b, int n);
+void vec_lte_vec(double* arr, double* b, int n);
+void vec_lte_scalar(double* arr, double b, int n);
+void vec_gte_vec(double* arr, double* b, int n);
+void vec_gte_scalar(double* arr, double b, int n);
 
 #ifdef __cplusplus
 }

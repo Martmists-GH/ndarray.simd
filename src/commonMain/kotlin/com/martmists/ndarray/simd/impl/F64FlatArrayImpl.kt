@@ -1,6 +1,7 @@
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
+import com.martmists.ndarray.simd.F64Array.Companion.zeros
 import com.martmists.ndarray.simd.F64FlatArray
 import kotlin.math.*
 
@@ -86,6 +87,13 @@ internal open class F64FlatArrayImpl internal constructor(
         }
     }
 
+    override fun transpose(ax1: Int, ax2: Int): F64Array {
+        val axMin = min(ax1, ax2)
+        val axMax = max(ax1, ax2)
+        check(axMin == 0 && axMax == 1) { "1D arrays can only be transposed on axis 0 and 1" }
+        return F64Array.create(data, offset, intArrayOf(strides[0], 1), intArrayOf(length, 1))
+    }
+
     private inline fun balancedSum(getter: (Int) -> Double): Double {
         var accUnaligned = 0.0
         var remaining = length
@@ -119,6 +127,16 @@ internal open class F64FlatArrayImpl internal constructor(
     }
 
     override fun dot(other: F64Array) = balancedSum { unsafeGet(it) * other[it] }
+
+    override fun outer(other: F64FlatArray): F64Array {
+        val res = zeros(length, other.length)
+        for (i in 0 until length) {
+            for (j in 0 until other.length) {
+                res[i, j] = unsafeGet(i) * other[j]
+            }
+        }
+        return res
+    }
 
     override fun sum(): Double = balancedSum { unsafeGet(it) }
 
@@ -210,7 +228,7 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun logBaseInPlace(base: Double) = log2(base).let { lb -> transformInPlace { log2(it) / lb } }
     override fun sqrtInPlace() = transformInPlace(::sqrt)
     override fun powInPlace(power: Double) = transformInPlace { it.pow(power) }
-    override fun ipowInPlace(base: Double) = transformInPlace { base.pow(it) }
+    override fun expBaseInPlace(base: Double) = transformInPlace { base.pow(it) }
     override fun unaryMinusInPlace() = transformInPlace(Double::unaryMinus)
     override fun plusAssign(other: F64Array) = zipTransformInPlace(other, Double::plus)
     override fun plusAssign(other: Double) = transformInPlace { it + other }
@@ -223,8 +241,12 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun absInPlace() = transformInPlace(Double::absoluteValue)
     override fun ltInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a < b) 1.0 else 0.0 }
     override fun ltInPlace(other: Double) = transformInPlace { if (it < other) 1.0 else 0.0 }
+    override fun lteInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a <= b) 1.0 else 0.0 }
+    override fun lteInPlace(other: Double) = transformInPlace { if (it <= other) 1.0 else 0.0 }
     override fun gtInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a > b) 1.0 else 0.0 }
     override fun gtInPlace(other: Double) = transformInPlace { if (it > other) 1.0 else 0.0 }
+    override fun gteInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a >= b) 1.0 else 0.0 }
+    override fun gteInPlace(other: Double) = transformInPlace { if (it >= other) 1.0 else 0.0 }
     override fun eqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a == b) 1.0 else 0.0 }
     override fun eqInPlace(other: Double) = transformInPlace { if (it == other) 1.0 else 0.0 }
     override fun neqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a != b) 1.0 else 0.0 }

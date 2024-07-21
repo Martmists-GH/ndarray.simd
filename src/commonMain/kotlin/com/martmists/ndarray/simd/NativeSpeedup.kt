@@ -30,8 +30,12 @@ internal expect object NativeSpeedup {
     fun vecNeqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun vecLtVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     fun vecLtScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    fun vecLteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    fun vecLteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun vecGtVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     fun vecGtScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    fun vecGteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    fun vecGteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
 
     fun vecSqrt(a: DoubleArray, aOffset: Int, aSize: Int)
     fun vecPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)

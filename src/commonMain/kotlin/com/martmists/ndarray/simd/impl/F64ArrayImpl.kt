@@ -113,7 +113,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun copy(): F64Array {
-        return F64Array.full(shape, 0.0).also { this.copyTo(it) }
+        return F64Array.full(*shape, init=0.0).also { this.copyTo(it) }
     }
 
     override fun copyTo(other: F64Array) {
@@ -155,6 +155,23 @@ internal open class F64ArrayImpl internal constructor(
             get = { pos -> view(pos, axis).copy() },
             set = { pos, value -> value.copyTo(view(pos, axis)) }
         )
+    }
+
+    override fun transpose(ax1: Int, ax2: Int): F64Array {
+        check(nDim == 2) { "transpose is only supported for 2D arrays" }
+        check(ax1 in 0 until nDim) { "axis 1 out of bounds: $ax1" }
+        check(ax2 in 0 until nDim) { "axis 2 out of bounds: $ax2" }
+        check(ax1 != ax2) { "axes must be different" }
+
+        val newStrides = strides.copyOf()
+        newStrides[ax1] = strides[ax2]
+        newStrides[ax2] = strides[ax1]
+
+        val newShape = shape.copyOf()
+        newShape[ax1] = shape[ax2]
+        newShape[ax2] = shape[ax1]
+
+        return F64Array.create(data, offset, newStrides, newShape)
     }
 
     override fun sum(): Double = unrollToFlat().map { it.sum() }.sum()
@@ -229,8 +246,8 @@ internal open class F64ArrayImpl internal constructor(
         unrollToFlat().forEach { it.powInPlace(power) }
     }
 
-    override fun ipowInPlace(base: Double) {
-        unrollToFlat().forEach { it.ipowInPlace(base) }
+    override fun expBaseInPlace(base: Double) {
+        unrollToFlat().forEach { it.expBaseInPlace(base) }
     }
 
     override fun unaryMinusInPlace() {
@@ -281,12 +298,28 @@ internal open class F64ArrayImpl internal constructor(
         unrollToFlat().forEach { it.ltInPlace(other) }
     }
 
+    override fun lteInPlace(other: F64Array) {
+        commonUnrollToFlat(other) { a, b -> a.lteInPlace(b) }
+    }
+
+    override fun lteInPlace(other: Double) {
+        unrollToFlat().forEach { it.lteInPlace(other) }
+    }
+
     override fun gtInPlace(other: F64Array) {
         commonUnrollToFlat(other) { a, b -> a.gtInPlace(b) }
     }
 
     override fun gtInPlace(other: Double) {
         unrollToFlat().forEach { it.gtInPlace(other) }
+    }
+
+    override fun gteInPlace(other: F64Array) {
+        commonUnrollToFlat(other) { a, b -> a.gteInPlace(b) }
+    }
+
+    override fun gteInPlace(other: Double) {
+        unrollToFlat().forEach { it.gteInPlace(other) }
     }
 
     override fun eqInPlace(other: F64Array) {
@@ -412,7 +445,7 @@ internal open class F64ArrayImpl internal constructor(
             "matmul dimensions do not match: ${shape[1]} != ${other.shape[0]}"
         }
         val resultShape = intArrayOf(shape[0], other.shape[1])
-        val result = F64Array.full(resultShape, 0.0)
+        val result = F64Array.full(*resultShape, init=0.0)
         for (i in 0 until shape[0]) {
             for (j in 0 until other.shape[1]) {
                 for (k in 0 until shape[1]) {

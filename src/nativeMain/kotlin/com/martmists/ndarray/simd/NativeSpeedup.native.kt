@@ -190,6 +190,20 @@ internal actual object NativeSpeedup {
         }
     }
 
+    actual fun vecLteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
+        a.usePinned { pinA ->
+            b.usePinned { pinB ->
+                simd.vec_lte_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize)
+            }
+        }
+    }
+
+    actual fun vecLteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
+        a.usePinned { pinA ->
+            simd.vec_lte_scalar(pinA.addressOf(aOffset), b, aSize)
+        }
+    }
+
     actual fun vecGtVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
         a.usePinned { pinA ->
             b.usePinned { pinB ->
@@ -201,6 +215,20 @@ internal actual object NativeSpeedup {
     actual fun vecGtScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
         a.usePinned { pinA ->
             simd.vec_gt_scalar(pinA.addressOf(aOffset), b, aSize)
+        }
+    }
+
+    actual fun vecGteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
+        a.usePinned { pinA ->
+            b.usePinned { pinB ->
+                simd.vec_gte_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize)
+            }
+        }
+    }
+
+    actual fun vecGteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
+        a.usePinned { pinA ->
+            simd.vec_gte_scalar(pinA.addressOf(aOffset), b, aSize)
         }
     }
 

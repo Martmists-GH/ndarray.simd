@@ -1,5 +1,10 @@
 package com.martmists.ndarray.simd
 
+/**
+ * An indexable object.
+ *
+ * This is used to index into an [F64Array] with a single index call, rather than multiple [F64Array.view] calls.
+ */
 interface Viewer {
     operator fun get(vararg indices: Int): F64Array
     operator fun set(vararg indices: Int, other: F64Array)

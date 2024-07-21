@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.0.6"
+version = "1.0.7"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -15,6 +15,8 @@ repositories {
 }
 
 kotlin {
+    withSourcesJar()
+
     jvm()
 
     val natives = if (isProduction) {
