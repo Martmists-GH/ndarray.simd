@@ -1,7 +1,6 @@
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
-import com.martmists.ndarray.simd.F64Array.Companion.zeros
 import com.martmists.ndarray.simd.F64FlatArray
 import kotlin.math.*
 
@@ -129,7 +128,7 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun dot(other: F64Array) = balancedSum { unsafeGet(it) * other[it] }
 
     override fun outer(other: F64FlatArray): F64Array {
-        val res = zeros(length, other.length)
+        val res = F64Array.zeros(length, other.length)
         for (i in 0 until length) {
             for (j in 0 until other.length) {
                 res[i, j] = unsafeGet(i) * other[j]

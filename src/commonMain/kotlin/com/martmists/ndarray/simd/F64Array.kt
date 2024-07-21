@@ -197,6 +197,7 @@ interface F64Array {
      * @param ax1 the first axis
      * @param ax2 the second axis
      * @return the transposed array
+     * @since 1.0.7
      */
     fun transpose(ax1: Int = 0, ax2: Int = 1): F64Array
 
@@ -1468,6 +1469,7 @@ interface F64Array {
          *
          * @param shape the shape of the array
          * @return the created array
+         * @since 1.0.7
          */
         @JvmStatic
         fun random(vararg shape: Int): F64Array = random(*shape, random = Random)
@@ -1491,6 +1493,7 @@ interface F64Array {
          * @param stop the stop value
          * @param num the number of values
          * @return the created array
+         * @since 1.0.7
          */
         @JvmStatic
         @JvmOverloads

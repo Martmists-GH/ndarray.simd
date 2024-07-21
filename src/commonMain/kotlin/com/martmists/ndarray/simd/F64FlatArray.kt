@@ -59,11 +59,18 @@ interface F64FlatArray : F64Array {
 
     /**
      * Calculates the dot product of this array with another.
+     *
+     * @param other The other array to calculate the dot product with.
+     * @return The dot product of the two arrays.
      */
     infix fun dot(other: F64Array): Double = (this * other).sum()
 
     /**
      * Calculates the outer product of this array with another.
+     *
+     * @param other The other array to calculate the outer product with.
+     * @return The outer product of the two arrays.
+     * @since 1.0.7
      */
     infix fun outer(other: F64FlatArray): F64Array
 
