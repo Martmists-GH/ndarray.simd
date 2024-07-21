@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.*
@@ -13,15 +15,15 @@ internal open class F64ArrayImpl internal constructor(
 ) : F64Array {
     override val isFlattenable = unrollDim == nDim
 
-    protected inline fun F64Array.unsafeIndex(r: Int, c: Int): Int {
+    private inline fun F64Array.unsafeIndex(r: Int, c: Int): Int {
         return offset + r * strides[0] + c * strides[1]
     }
 
-    protected inline fun F64Array.unsafeIndex(d: Int, r: Int, c: Int): Int {
+    private inline fun F64Array.unsafeIndex(d: Int, r: Int, c: Int): Int {
         return offset + d * strides[0] + r * strides[1] + c * strides[2]
     }
 
-    protected inline fun F64Array.unsafeIndex(indices: IntArray): Int {
+    private inline fun F64Array.unsafeIndex(indices: IntArray): Int {
         return strides.foldIndexed(offset) { i, acc, stride -> acc + indices[i] * stride }
     }
 

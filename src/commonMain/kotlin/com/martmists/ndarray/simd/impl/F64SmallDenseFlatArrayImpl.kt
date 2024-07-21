@@ -4,6 +4,4 @@ internal class F64SmallDenseFlatArrayImpl(
     data: DoubleArray,
     offset: Int,
     size: Int
-) : F64DenseFlatArrayBase(data, offset, size) {
-
-}
+) : F64DenseFlatArrayBase(data, offset, size)

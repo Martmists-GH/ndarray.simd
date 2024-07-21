@@ -40,7 +40,6 @@ interface F64Array {
     /**
      * The shape of the array.
      */
-    @get:Deprecated("This should not be accessed directly")
     val shape: IntArray
 
     /**

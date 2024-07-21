@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.martmists.ndarray.simd.jni
 
 import jni.JNIEnvVar
