@@ -5,13 +5,13 @@ package com.martmists.ndarray.simd.impl
 import com.martmists.ndarray.simd.*
 
 internal open class F64ArrayImpl internal constructor(
-        override val data: DoubleArray,
-        override val offset: Int,
-        override val strides: IntArray,
-        override val shape: IntArray,
-        override val unrollDim: Int,
-        override val unrollStride: Int,
-        override val unrollSize: Int
+        final override val data: DoubleArray,
+        final override val offset: Int,
+        final override val strides: IntArray,
+        final override val shape: IntArray,
+        final override val unrollDim: Int,
+        final override val unrollStride: Int,
+        final override val unrollSize: Int
 ) : F64Array {
     override val isFlattenable = unrollDim == nDim
 
@@ -115,11 +115,11 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun copy(): F64Array {
-        return F64Array.full(*shape, init=0.0).also { this.copyTo(it) }
+        return F64Array.full(*shape, init=0.0).also(this::copyTo)
     }
 
     override fun copyTo(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.copyTo(b) }
+        commonUnrollToFlat(other, F64FlatArray::copyTo)
     }
 
     override fun flatten(): F64FlatArray {
@@ -176,13 +176,13 @@ internal open class F64ArrayImpl internal constructor(
         return F64Array.create(data, offset, newStrides, newShape)
     }
 
-    override fun sum(): Double = unrollToFlat().map { it.sum() }.sum()
+    override fun sum(): Double = unrollToFlat().map(F64FlatArray::sum).sum()
 
-    override fun min(): Double = unrollToFlat().map { it.min() }.minOrNull() ?: Double.POSITIVE_INFINITY
+    override fun min(): Double = unrollToFlat().map(F64FlatArray::min).minOrNull() ?: Double.POSITIVE_INFINITY
 
-    override fun max(): Double = unrollToFlat().map { it.max() }.maxOrNull() ?: Double.NEGATIVE_INFINITY
+    override fun max(): Double = unrollToFlat().map(F64FlatArray::max).maxOrNull() ?: Double.NEGATIVE_INFINITY
 
-    override fun product(): Double = unrollToFlat().map { it.product() }.reduce(Double::times)
+    override fun product(): Double = unrollToFlat().map(F64FlatArray::product).reduce(Double::times)
 
     override fun coerceInPlace(min: Double, max: Double) {
         unrollToFlat().forEach { it.coerceInPlace(min, max) }
@@ -213,27 +213,27 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun expInPlace() {
-        unrollToFlat().forEach { it.expInPlace() }
+        unrollToFlat().forEach(F64FlatArray::expInPlace)
     }
 
     override fun expm1InPlace() {
-        unrollToFlat().forEach { it.expm1InPlace() }
+        unrollToFlat().forEach(F64FlatArray::expm1InPlace)
     }
 
     override fun logInPlace() {
-        unrollToFlat().forEach { it.logInPlace() }
+        unrollToFlat().forEach(F64FlatArray::logInPlace)
     }
 
     override fun log1pInPlace() {
-        unrollToFlat().forEach { it.log1pInPlace() }
+        unrollToFlat().forEach(F64FlatArray::log1pInPlace)
     }
 
     override fun log2InPlace() {
-        unrollToFlat().forEach { it.log2InPlace() }
+        unrollToFlat().forEach(F64FlatArray::log2InPlace)
     }
 
     override fun log10InPlace() {
-        unrollToFlat().forEach { it.log10InPlace() }
+        unrollToFlat().forEach(F64FlatArray::log10InPlace)
     }
 
     override fun logBaseInPlace(base: Double) {
@@ -241,7 +241,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun sqrtInPlace() {
-        unrollToFlat().forEach { it.sqrtInPlace() }
+        unrollToFlat().forEach(F64FlatArray::sqrtInPlace)
     }
 
     override fun powInPlace(power: Double) {
@@ -253,11 +253,11 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun unaryMinusInPlace() {
-        unrollToFlat().forEach { it.unaryMinusInPlace() }
+        unrollToFlat().forEach(F64FlatArray::unaryMinusInPlace)
     }
 
     override fun plusAssign(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.plusAssign(b) }
+        commonUnrollToFlat(other, F64FlatArray::plusAssign)
     }
 
     override fun plusAssign(other: Double) {
@@ -265,7 +265,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun minusAssign(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.minusAssign(b) }
+        commonUnrollToFlat(other, F64FlatArray::minusAssign)
     }
 
     override fun minusAssign(other: Double) {
@@ -273,7 +273,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun timesAssign(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.timesAssign(b) }
+        commonUnrollToFlat(other, F64FlatArray::timesAssign)
     }
 
     override fun timesAssign(other: Double) {
@@ -281,7 +281,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun divAssign(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.divAssign(b) }
+        commonUnrollToFlat(other, F64FlatArray::divAssign)
     }
 
     override fun divAssign(other: Double) {
@@ -289,11 +289,11 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun absInPlace() {
-        unrollToFlat().forEach { it.absInPlace() }
+        unrollToFlat().forEach(F64FlatArray::absInPlace)
     }
 
     override fun ltInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.ltInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::ltInPlace)
     }
 
     override fun ltInPlace(other: Double) {
@@ -301,7 +301,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun lteInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.lteInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::lteInPlace)
     }
 
     override fun lteInPlace(other: Double) {
@@ -309,7 +309,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun gtInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.gtInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::gtInPlace)
     }
 
     override fun gtInPlace(other: Double) {
@@ -317,7 +317,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun gteInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.gteInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::gteInPlace)
     }
 
     override fun gteInPlace(other: Double) {
@@ -325,7 +325,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun eqInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.eqInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::eqInPlace)
     }
 
     override fun eqInPlace(other: Double) {
@@ -333,7 +333,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun neqInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.neqInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::neqInPlace)
     }
 
     override fun neqInPlace(other: Double) {
@@ -341,7 +341,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun andInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.andInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::andInPlace)
     }
 
     override fun andInPlace(other: Int) {
@@ -349,7 +349,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun orInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.orInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::orInPlace)
     }
 
     override fun orInPlace(other: Int) {
@@ -357,7 +357,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun xorInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.xorInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::xorInPlace)
     }
 
     override fun xorInPlace(other: Int) {
@@ -365,11 +365,11 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun notInPlace() {
-        unrollToFlat().forEach { it.notInPlace() }
+        unrollToFlat().forEach(F64FlatArray::notInPlace)
     }
 
     override fun shlInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.shlInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::shlInPlace)
     }
 
     override fun shlInPlace(other: Int) {
@@ -377,7 +377,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun shrInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.shrInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::shrInPlace)
     }
 
     override fun shrInPlace(other: Int) {
@@ -385,59 +385,59 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun sinInPlace() {
-        unrollToFlat().forEach { it.sinInPlace() }
+        unrollToFlat().forEach(F64FlatArray::sinInPlace)
     }
 
     override fun cosInPlace() {
-        unrollToFlat().forEach { it.cosInPlace() }
+        unrollToFlat().forEach(F64FlatArray::cosInPlace)
     }
 
     override fun tanInPlace() {
-        unrollToFlat().forEach { it.tanInPlace() }
+        unrollToFlat().forEach(F64FlatArray::tanInPlace)
     }
 
     override fun asinInPlace() {
-        unrollToFlat().forEach { it.asinInPlace() }
+        unrollToFlat().forEach(F64FlatArray::asinInPlace)
     }
 
     override fun acosInPlace() {
-        unrollToFlat().forEach { it.acosInPlace() }
+        unrollToFlat().forEach(F64FlatArray::acosInPlace)
     }
 
     override fun atanInPlace() {
-        unrollToFlat().forEach { it.atanInPlace() }
+        unrollToFlat().forEach(F64FlatArray::atanInPlace)
     }
 
     override fun atan2InPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.atan2InPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::atan2InPlace)
     }
 
     override fun sinhInPlace() {
-        unrollToFlat().forEach { it.sinhInPlace() }
+        unrollToFlat().forEach(F64FlatArray::sinhInPlace)
     }
 
     override fun coshInPlace() {
-        unrollToFlat().forEach { it.coshInPlace() }
+        unrollToFlat().forEach(F64FlatArray::coshInPlace)
     }
 
     override fun tanhInPlace() {
-        unrollToFlat().forEach { it.tanhInPlace() }
+        unrollToFlat().forEach(F64FlatArray::tanhInPlace)
     }
 
     override fun asinhInPlace() {
-        unrollToFlat().forEach { it.asinhInPlace() }
+        unrollToFlat().forEach(F64FlatArray::asinhInPlace)
     }
 
     override fun acoshInPlace() {
-        unrollToFlat().forEach { it.acoshInPlace() }
+        unrollToFlat().forEach(F64FlatArray::acoshInPlace)
     }
 
     override fun atanhInPlace() {
-        unrollToFlat().forEach { it.atanhInPlace() }
+        unrollToFlat().forEach(F64FlatArray::atanhInPlace)
     }
 
     override fun hypotInPlace(other: F64Array) {
-        commonUnrollToFlat(other) { a, b -> a.hypotInPlace(b) }
+        commonUnrollToFlat(other, F64FlatArray::hypotInPlace)
     }
 
     override fun matmul(other: F64Array): F64Array {

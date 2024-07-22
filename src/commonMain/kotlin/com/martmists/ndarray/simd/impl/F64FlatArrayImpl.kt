@@ -137,7 +137,7 @@ internal open class F64FlatArrayImpl internal constructor(
         return res
     }
 
-    override fun sum(): Double = balancedSum { unsafeGet(it) }
+    override fun sum(): Double = balancedSum(unsafeGet)
 
     override fun min() = unsafeGet(argMin())
 
