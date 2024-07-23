@@ -232,6 +232,24 @@ internal actual object NativeSpeedup {
         }
     }
 
+    actual fun vecIsNan(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_isnan(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
+    actual fun vecIsInf(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_isinf(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
+    actual fun vecIsFinite(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_isfinite(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
     actual fun vecSqrt(a: DoubleArray, aOffset: Int, aSize: Int) {
         a.usePinned { pinA ->
             simd.vec_sqrt(pinA.addressOf(aOffset), aSize)
@@ -349,6 +367,30 @@ internal actual object NativeSpeedup {
     actual fun vecCoerce(a: DoubleArray, aOffset: Int, aSize: Int, min: Double, max: Double) {
         a.usePinned { pinA ->
             simd.vec_coerce(pinA.addressOf(aOffset), aSize, min, max)
+        }
+    }
+
+    actual fun vecFloor(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_floor(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
+    actual fun vecCeil(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_ceil(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
+    actual fun vecTrunc(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_trunc(pinA.addressOf(aOffset), aSize)
+        }
+    }
+
+    actual fun vecRound(a: DoubleArray, aOffset: Int, aSize: Int) {
+        a.usePinned { pinA ->
+            simd.vec_round(pinA.addressOf(aOffset), aSize)
         }
     }
 

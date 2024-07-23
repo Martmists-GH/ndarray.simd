@@ -135,6 +135,10 @@ internal class F64LargeDenseFlatArrayImpl(
     }
     override fun neqInPlace(other: Double) = NativeSpeedup.vecNeqScalar(data, offset, length, other)
 
+    override fun isNanInPlace() = NativeSpeedup.vecIsNan(data, offset, length)
+    override fun isInfInPlace() = NativeSpeedup.vecIsInf(data, offset, length)
+    override fun isFiniteInPlace() = NativeSpeedup.vecIsFinite(data, offset, length)
+
     override fun andInPlace(other: F64Array) {
         if (other is F64LargeDenseFlatArrayImpl) {
             checkShape(other)
@@ -181,6 +185,11 @@ internal class F64LargeDenseFlatArrayImpl(
         }
     }
     override fun shrInPlace(other: Int) = NativeSpeedup.vecRShiftScalar(data, offset, length, other)
+
+    override fun floorInPlace() = NativeSpeedup.vecFloor(data, offset, length)
+    override fun ceilInPlace() = NativeSpeedup.vecCeil(data, offset, length)
+    override fun truncInPlace() = NativeSpeedup.vecTrunc(data, offset, length)
+    override fun roundInPlace() = NativeSpeedup.vecRound(data, offset, length)
 
     override fun sinInPlace() = NativeSpeedup.vecSin(data, offset, length)
     override fun cosInPlace() = NativeSpeedup.vecCos(data, offset, length)

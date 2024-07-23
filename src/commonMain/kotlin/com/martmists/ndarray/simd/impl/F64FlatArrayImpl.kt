@@ -250,6 +250,9 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun eqInPlace(other: Double) = transformInPlace { if (it == other) 1.0 else 0.0 }
     override fun neqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a != b) 1.0 else 0.0 }
     override fun neqInPlace(other: Double) = transformInPlace { if (it != other) 1.0 else 0.0 }
+    override fun isNanInPlace() = transformInPlace { if (it.isNaN()) 1.0 else 0.0 }
+    override fun isInfInPlace() = transformInPlace { if (it.isInfinite()) 1.0 else 0.0 }
+    override fun isFiniteInPlace() = transformInPlace { if (it.isFinite()) 1.0 else 0.0 }
     override fun andInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> (a.toInt() and b.toInt()).toDouble() }
     override fun andInPlace(other: Int) = transformInPlace { (it.toInt() and other).toDouble() }
     override fun orInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> (a.toInt() or b.toInt()).toDouble() }
@@ -261,6 +264,10 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun shlInPlace(other: Int) = transformInPlace { (it.toInt() shl other).toDouble() }
     override fun shrInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> (a.toInt() shr b.toInt()).toDouble() }
     override fun shrInPlace(other: Int) = transformInPlace { (it.toInt() shr other).toDouble() }
+    override fun floorInPlace() = transformInPlace(::floor)
+    override fun ceilInPlace() = transformInPlace(::ceil)
+    override fun truncInPlace() = transformInPlace(::truncate)
+    override fun roundInPlace() = transformInPlace(::round)
     override fun sinInPlace() = transformInPlace(::sin)
     override fun cosInPlace() = transformInPlace(::cos)
     override fun tanInPlace() = transformInPlace(::tan)

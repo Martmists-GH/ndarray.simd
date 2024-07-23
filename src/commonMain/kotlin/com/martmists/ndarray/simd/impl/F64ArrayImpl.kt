@@ -5,13 +5,19 @@ package com.martmists.ndarray.simd.impl
 import com.martmists.ndarray.simd.*
 
 internal open class F64ArrayImpl internal constructor(
-        final override val data: DoubleArray,
-        final override val offset: Int,
-        final override val strides: IntArray,
-        final override val shape: IntArray,
-        final override val unrollDim: Int,
-        final override val unrollStride: Int,
-        final override val unrollSize: Int
+    @get:Deprecated("This should not be accessed directly")
+    final override val data: DoubleArray,
+    @get:Deprecated("This should not be accessed directly")
+    final override val offset: Int,
+    @get:Deprecated("This should not be accessed directly")
+    final override val strides: IntArray,
+    final override val shape: IntArray,
+    @get:Deprecated("This should not be accessed directly")
+    final override val unrollDim: Int,
+    @get:Deprecated("This should not be accessed directly")
+    final override val unrollStride: Int,
+    @get:Deprecated("This should not be accessed directly")
+    final override val unrollSize: Int
 ) : F64Array {
     override val isFlattenable = unrollDim == nDim
 
@@ -340,6 +346,18 @@ internal open class F64ArrayImpl internal constructor(
         unrollToFlat().forEach { it.neqInPlace(other) }
     }
 
+    override fun isNanInPlace() {
+        unrollToFlat().forEach(F64FlatArray::isNanInPlace)
+    }
+
+    override fun isInfInPlace() {
+        unrollToFlat().forEach(F64FlatArray::isInfInPlace)
+    }
+
+    override fun isFiniteInPlace() {
+        unrollToFlat().forEach(F64FlatArray::isFiniteInPlace)
+    }
+
     override fun andInPlace(other: F64Array) {
         commonUnrollToFlat(other, F64FlatArray::andInPlace)
     }
@@ -382,6 +400,22 @@ internal open class F64ArrayImpl internal constructor(
 
     override fun shrInPlace(other: Int) {
         unrollToFlat().forEach { it.shrInPlace(other) }
+    }
+
+    override fun floorInPlace() {
+        unrollToFlat().forEach(F64FlatArray::floorInPlace)
+    }
+
+    override fun ceilInPlace() {
+        unrollToFlat().forEach(F64FlatArray::ceilInPlace)
+    }
+
+    override fun truncInPlace() {
+        unrollToFlat().forEach(F64FlatArray::truncInPlace)
+    }
+
+    override fun roundInPlace() {
+        unrollToFlat().forEach(F64FlatArray::roundInPlace)
     }
 
     override fun sinInPlace() {

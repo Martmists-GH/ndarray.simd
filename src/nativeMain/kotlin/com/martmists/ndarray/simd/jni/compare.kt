@@ -167,3 +167,39 @@ fun jni_vec_lte_scalar(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdouble
         env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
     }
 }
+
+@CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecIsNan")
+fun jni_vec_is_nan(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint) {
+    memScoped {
+        val arrA = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, a, null)!!.reinterpret<DoubleVar>()
+        val refA = interpretCPointer<DoubleVar>(arrA.rawValue + aOffset * sizeOf<DoubleVar>())
+
+        vec_isnan(refA, aSize)
+
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
+    }
+}
+
+@CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecIsInf")
+fun jni_vec_is_inf(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint) {
+    memScoped {
+        val arrA = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, a, null)!!.reinterpret<DoubleVar>()
+        val refA = interpretCPointer<DoubleVar>(arrA.rawValue + aOffset * sizeOf<DoubleVar>())
+
+        vec_isinf(refA, aSize)
+
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
+    }
+}
+
+@CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecIsFinite")
+fun jni_vec_is_finite(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint) {
+    memScoped {
+        val arrA = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, a, null)!!.reinterpret<DoubleVar>()
+        val refA = interpretCPointer<DoubleVar>(arrA.rawValue + aOffset * sizeOf<DoubleVar>())
+
+        vec_isfinite(refA, aSize)
+
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
+    }
+}

@@ -62,6 +62,10 @@ internal actual object NativeSpeedup {
     actual external fun vecGteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     actual external fun vecGteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
 
+    actual external fun vecIsNan(a: DoubleArray, aOffset: Int, aSize: Int)
+    actual external fun vecIsInf(a: DoubleArray, aOffset: Int, aSize: Int)
+    actual external fun vecIsFinite(a: DoubleArray, aOffset: Int, aSize: Int)
+
     actual external fun vecSqrt(a: DoubleArray, aOffset: Int, aSize: Int)
     actual external fun vecPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     actual external fun veciPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
@@ -84,6 +88,11 @@ internal actual object NativeSpeedup {
     actual external fun vecVariance(a: DoubleArray, aOffset: Int, aSize: Int): Double
     actual external fun vecStdDev(a: DoubleArray, aOffset: Int, aSize: Int): Double
     actual external fun vecCoerce(a: DoubleArray, aOffset: Int, aSize: Int, min: Double, max: Double)
+
+    actual external fun vecFloor(a: DoubleArray, aOffset: Int, aSize: Int)
+    actual external fun vecCeil(a: DoubleArray, aOffset: Int, aSize: Int)
+    actual external fun vecTrunc(a: DoubleArray, aOffset: Int, aSize: Int)
+    actual external fun vecRound(a: DoubleArray, aOffset: Int, aSize: Int)
 
     actual external fun vecSin(a: DoubleArray, aOffset: Int, aSize: Int)
     actual external fun vecCos(a: DoubleArray, aOffset: Int, aSize: Int)

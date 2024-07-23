@@ -805,6 +805,48 @@ interface F64Array {
     infix fun neq(other: Double): F64Array = copy().apply { neqInPlace(other) }
 
     /**
+     * Compares if each element in the array is NaN in place.
+     *
+     * @see kotlin.Double.isNaN
+     */
+    fun isNanInPlace() = transformInPlace { if (it.isNaN()) 1.0 else 0.0 }
+
+    /**
+     * Compares if each element in the array is NaN.
+     *
+     * @return the computed array, where 1.0 is true and 0.0 is false
+     */
+    fun isNan(): F64Array = copy().apply { isNanInPlace() }
+
+    /**
+     * Compares if each element in the array is infinite in place.
+     *
+     * @see kotlin.Double.isInfinite
+     */
+    fun isInfInPlace() = transformInPlace { if (it.isInfinite()) 1.0 else 0.0 }
+
+    /**
+     * Compares if each element in the array is infinite.
+     *
+     * @return the computed array, where 1.0 is true and 0.0 is false
+     */
+    fun isInf(): F64Array = copy().apply { isInfInPlace() }
+
+    /**
+     * Compares if each element in the array is finite in place.
+     *
+     * @see kotlin.Double.isFinite
+     */
+    fun isFiniteInPlace() = transformInPlace { if (it.isFinite()) 1.0 else 0.0 }
+
+    /**
+     * Compares if each element in the array is finite.
+     *
+     * @return the computed array, where 1.0 is true and 0.0 is false
+     */
+    fun isFinite(): F64Array = copy().apply { isFiniteInPlace() }
+
+    /**
      * Computes the bitwise and of each element in the array with another array in place.
      * The values are first cast to integers before the operation.
      *
@@ -987,6 +1029,62 @@ interface F64Array {
      * @return the computed array
      */
     infix fun shr(other: Int): F64Array = copy().apply { shrInPlace(other) }
+
+    /**
+     * Computes the floor of each element in the array in place.
+     *
+     * @see kotlin.math.floor
+     */
+    fun floorInPlace() = transformInPlace(::floor)
+
+    /**
+     * Computes the floor of each element in the array.
+     *
+     * @return the computed array
+     */
+    fun floor(): F64Array = copy().apply { floorInPlace() }
+
+    /**
+     * Computes the ceiling of each element in the array in place.
+     *
+     * @see kotlin.math.ceil
+     */
+    fun ceilInPlace() = transformInPlace(::ceil)
+
+    /**
+     * Computes the ceiling of each element in the array.
+     *
+     * @return the computed array
+     */
+    fun ceil(): F64Array = copy().apply { ceilInPlace() }
+
+    /**
+     * Truncates each element in the array in place.
+     *
+     * @see kotlin.math.truncate
+     */
+    fun truncInPlace() = transformInPlace(::truncate)
+
+    /**
+     * Truncates each element in the array.
+     *
+     * @return the computed array
+     */
+    fun trunc(): F64Array = copy().apply { truncInPlace() }
+
+    /**
+     * Rounds each element in the array in place.
+     *
+     * @see kotlin.math.round
+     */
+    fun roundInPlace() = transformInPlace(::round)
+
+    /**
+     * Rounds each element in the array.
+     *
+     * @return the computed array
+     */
+    fun round(): F64Array = copy().apply { roundInPlace() }
 
     /**
      * Computes the sine of each element in the array in place.

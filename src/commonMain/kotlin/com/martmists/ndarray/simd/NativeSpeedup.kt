@@ -37,6 +37,10 @@ internal expect object NativeSpeedup {
     fun vecGteVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     fun vecGteScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
 
+    fun vecIsNan(a: DoubleArray, aOffset: Int, aSize: Int)
+    fun vecIsInf(a: DoubleArray, aOffset: Int, aSize: Int)
+    fun vecIsFinite(a: DoubleArray, aOffset: Int, aSize: Int)
+
     fun vecSqrt(a: DoubleArray, aOffset: Int, aSize: Int)
     fun vecPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun veciPow(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
@@ -59,6 +63,11 @@ internal expect object NativeSpeedup {
     fun vecVariance(a: DoubleArray, aOffset: Int, aSize: Int): Double
     fun vecStdDev(a: DoubleArray, aOffset: Int, aSize: Int): Double
     fun vecCoerce(a: DoubleArray, aOffset: Int, aSize: Int, min: Double, max: Double)
+
+    fun vecFloor(a: DoubleArray, aOffset: Int, aSize: Int)
+    fun vecCeil(a: DoubleArray, aOffset: Int, aSize: Int)
+    fun vecTrunc(a: DoubleArray, aOffset: Int, aSize: Int)
+    fun vecRound(a: DoubleArray, aOffset: Int, aSize: Int)
 
     fun vecSin(a: DoubleArray, aOffset: Int, aSize: Int)
     fun vecCos(a: DoubleArray, aOffset: Int, aSize: Int)

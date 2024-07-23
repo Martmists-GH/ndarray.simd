@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
