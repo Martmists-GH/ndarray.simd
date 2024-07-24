@@ -1,13 +1,14 @@
+import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 
 plugins {
-    kotlin("multiplatform") version "2.0.0"
+    kotlin("multiplatform")
     `maven-publish`
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.0.9"
+version = "1.0.10"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -75,13 +76,6 @@ kotlin {
                     extraOpts("-Xsource-compiler-option", "-std=c++20")
                     extraOpts("-Xsource-compiler-option", "-O2")
 
-                    if (target.name.startsWith("macos")) {
-                        extraOpts("-Xsource-compiler-option", "-v")
-                        extraOpts("-Xsource-compiler-option", "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/")
-                        extraOpts("-Xsource-compiler-option", "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/")
-                        extraOpts("-Xsource-compiler-option", "-I~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/")
-                    }
-
                     val cppSource = projectDir.resolve("src/lib/cpp").listFiles().filter { it.extension == "cpp" }.map { it.absolutePath }
                     cppSource.forEach {
                         extraOpts("-Xcompile-source", it)
@@ -90,6 +84,81 @@ kotlin {
                     val includes = listOf("src/lib/public", "xsimd/include")
                     includes.forEach {
                         extraOpts("-Xsource-compiler-option", "-I${projectDir.resolve(it).absolutePath}")
+                    }
+
+                    val extraFlags = arrayOf(
+                        "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/",
+                        "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/",
+                        "-I~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/",
+                    )
+
+                    if (target.name.startsWith("macos")) {
+                        for (extraFlag in extraFlags) {
+                            extraOpts("-Xsource-compiler-option", extraFlag)
+                        }
+                    }
+
+                    val extensions = if (target.name.endsWith("X64")) {
+                        listOf(
+                            "avx2" to arrayOf("-mavx2"),
+                            "avx512bw" to arrayOf("-mavx512f", "-mavx512bw"),
+                            "avx512cd" to arrayOf("-mavx512cd"),
+                            "avx512dq" to arrayOf("-mavx512dq"),
+                            "avx512er" to arrayOf("-mavx512er"),
+                            "avx512f" to arrayOf("-mavx512f"),
+                            "avx512ifma" to arrayOf("-mavx512ifma"),
+                            "avx512pf" to arrayOf("-mavx512pf"),
+                            "avx512vbmi" to arrayOf("-mavx512vbmi"),
+                            "avx512vnni_avx512bw" to arrayOf("-mavx512vnni", "-mavx512bw"),
+                            "avx512vnni_avx512vbmi" to arrayOf("-mavx512vnni", "-mavx512vbmi"),
+                            "avx" to arrayOf("-mavx"),
+                            // "avxvnni" to arrayOf("-mavxvnni"),  // Not yet supported by Konan (as of 2.0.0)
+                            "fma3_avx2" to arrayOf("-mfma", "-mavx2"),
+                            "fma3_avx" to arrayOf("-mfma", "-mavx"),
+                            "fma3_sse4_2" to arrayOf("-mfma", "-msse4.2"),
+                            "fma4" to arrayOf("-mfma4"),
+                            "sse2" to arrayOf("-msse2"),
+                            "sse3" to arrayOf("-msse3"),
+                            "sse4_1" to arrayOf("-msse4.1"),
+                            "sse4_2" to arrayOf("-msse4.2"),
+                            "ssse3" to arrayOf("-mssse3"),
+                        )
+                    } else {
+                        listOf(
+                            "i8mm_neon64" to arrayOf("-mi8mm_neon64"),
+                            "neon64" to arrayOf("-mfpu=neon64"),
+                            "neon" to arrayOf("-mfpu=neon"),
+                            "sve_128" to arrayOf("-msve-vector-bits=128"),
+                            "sve_256" to arrayOf("-msve-vector-bits=256"),
+                            "sve_512" to arrayOf("-msve-vector-bits=512"),
+                        )
+                    }
+
+
+                    for ((file, flags) in extensions) {
+                        val task = tasks.register<KonanCompileTask>("$file${target.name.capitalized()}", target.konanTarget).apply {
+                            configure {
+                                files.from(
+                                    projectDir.resolve("src/lib/arch/$file.cpp"),
+                                )
+                                arguments.addAll(
+                                    "-c", "-o", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath,
+                                    "-fPIC", "-O2",
+                                    *flags,
+                                    *includes.map { include -> "-I${projectDir.resolve(include).absolutePath}" }.toTypedArray(),
+                                )
+
+                                if (target.name.startsWith("macos")) {
+                                    arguments.addAll(*extraFlags)
+                                }
+                            }
+                        }
+
+                        extraOpts("-Xsource-compiler-option", "-o", "-Xsource-compiler-option", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.absolutePath)
+
+                        tasks.named(interopProcessingTaskName) {
+                            dependsOn(task)
+                        }
                     }
                 }
             }

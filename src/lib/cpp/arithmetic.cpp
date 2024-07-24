@@ -1,18 +1,8 @@
-#include "common.h"
+#include "arithmetic_priv.h"
 
 extern "C" {
     void vec_add_scalar(double* a, double b, int n) {
-        std::size_t size = n - n % simd_size;
-
-        for (std::size_t i = 0; i < size; i += simd_size) {
-            auto va = xsimd::load_unaligned(&a[i]);
-            auto res = va + b;
-            xsimd::store_unaligned(&a[i], res);
-        }
-
-        for (std::size_t i = size; i < n; ++i) {
-            a[i] = a[i] + b;
-        }
+        _vec_add_scalar_dispatcher(a, b, n);
     }
 
     void vec_add_vec(double* a, double* b, int n) {
