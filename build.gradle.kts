@@ -125,9 +125,9 @@ kotlin {
                         )
                     } else {
                         listOf(
-                            "i8mm_neon64" to arrayOf("-mi8mm_neon64"),
-                            "neon64" to arrayOf("-mfpu=neon64"),
-                            "neon" to arrayOf("-mfpu=neon"),
+                            "i8mm_neon64" to arrayOf(),  // TODO: Figure out this part
+                            "neon64" to arrayOf(),  // NEON is supposedly enabled by default?
+                            "neon" to arrayOf(),
                             "sve_128" to arrayOf("-msve-vector-bits=128"),
                             "sve_256" to arrayOf("-msve-vector-bits=256"),
                             "sve_512" to arrayOf("-msve-vector-bits=512"),
