@@ -22,4 +22,4 @@ As such, most of the JVM code for NDArray is mostly the same as Viktor.
 
 ### License
 
-As of 1.0.10, this project is licensed under the [3-Clause BSD NON-AI License](https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3), with @Martmists-GH as the copyright holder.
+As of 1.0.10, this project is licensed under the [3-Clause BSD NON-AI License](https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3).

@@ -100,42 +100,77 @@ kotlin {
 
                     val extensions = if (target.name.endsWith("X64")) {
                         listOf(
-                            "avx2" to arrayOf("-mavx2"),
-                            "avx512bw" to arrayOf("-mavx512f", "-mavx512bw"),
-                            "avx512cd" to arrayOf("-mavx512cd"),
-                            "avx512dq" to arrayOf("-mavx512dq"),
-                            "avx512er" to arrayOf("-mavx512er"),
-                            "avx512f" to arrayOf("-mavx512f"),
-                            "avx512ifma" to arrayOf("-mavx512ifma"),
-                            "avx512pf" to arrayOf("-mavx512pf"),
-                            "avx512vbmi" to arrayOf("-mavx512vbmi"),
-                            "avx512vnni_avx512bw" to arrayOf("-mavx512vnni", "-mavx512bw"),
-                            "avx512vnni_avx512vbmi" to arrayOf("-mavx512vnni", "-mavx512vbmi"),
-                            "avx" to arrayOf("-mavx"),
-                            // "avxvnni" to arrayOf("-mavxvnni"),  // Not yet supported by Konan (as of 2.0.0)
-                            "fma3_avx2" to arrayOf("-mfma", "-mavx2"),
-                            "fma3_avx" to arrayOf("-mfma", "-mavx"),
-                            "fma3_sse4_2" to arrayOf("-mfma", "-msse4.2"),
-                            "fma4" to arrayOf("-mfma4"),
-                            "sse2" to arrayOf("-msse2"),
-                            "sse3" to arrayOf("-msse3"),
-                            "sse4_1" to arrayOf("-msse4.1"),
-                            "sse4_2" to arrayOf("-msse4.2"),
-                            "ssse3" to arrayOf("-mssse3"),
+                            "avx2",
+                            "avx512bw",
+                            "avx512cd",
+                            "avx512dq",
+                            "avx512er",
+                            "avx512f",
+                            "avx512ifma",
+                            "avx512pf",
+                            "avx512vbmi",
+                            "avx512vnni_avx512bw",
+//                            "avx512vnni_avx512vbmi",  // Seems to crash for some reason
+                            "avx",
+//                        "avxvnni, // Not yet supported by Konan (as of 2.0.0)
+                            "fma3_avx2",
+                            "fma3_avx",
+                            "fma3_sse4_2",
+                            "fma4",
+                            "sse2",
+                            "sse3",
+                            "sse4_1",
+                            "sse4_2",
+                            "ssse3",
                         )
                     } else {
                         listOf(
-                            "i8mm_neon64" to arrayOf(),  // TODO: Figure out this part
-                            "neon64" to arrayOf(),  // NEON is supposedly enabled by default?
-                            "neon" to arrayOf(),
-                            "sve_128" to arrayOf("-msve-vector-bits=128"),
-                            "sve_256" to arrayOf("-msve-vector-bits=256"),
-                            "sve_512" to arrayOf("-msve-vector-bits=512"),
+                            "i8mm_neon64",
+                            "neon64",
+                            "neon",
+                            "sve_128",
+                            "sve_256",
+                            "sve_512",
                         )
                     }
 
+                    fun flagsFor(ext: String): Array<String> = when (ext) {
+                        // == X86 ==
+                        "avx2" -> arrayOf("-mavx2") + flagsFor("avx")
+                        "avx512bw" -> arrayOf("-mavx512bw") + flagsFor("avx512dq")
+                        "avx512cd" -> arrayOf("-mavx512cd") + flagsFor("avx512f")
+                        "avx512dq" -> arrayOf("-mavx512dq") + flagsFor("avx512cd")
+                        "avx512er" -> arrayOf("-mavx512er") + flagsFor("avx512cd")
+                        "avx512f" -> arrayOf("-mavx512f")
+                        "avx512ifma" -> arrayOf("-mavx512ifma") + flagsFor("avx512bw")
+                        "avx512pf" -> arrayOf("-mavx512pf") + flagsFor("avx512er")
+                        "avx512vbmi" -> arrayOf("-mavx512vbmi") + flagsFor("avx512ifma")
+                        "avx512vnni_avx512bw" -> arrayOf("-mavx512vnni") + flagsFor("avx512bw")
+                        "avx512vnni_avx512vbmi" -> arrayOf("-mavx512vnni") + flagsFor("avx512vbmi")
+                        "avx" -> arrayOf("-mavx")
+                        "avxvnni" -> arrayOf("-mavxvnni") + flagsFor("avx2")
+                        "fma3_avx2" -> arrayOf("-mfma") + flagsFor("avx2")
+                        "fma3_avx" -> arrayOf("-mfma") + flagsFor("avx")
+                        "fma3_sse4_2" -> arrayOf("-mfma") + flagsFor("sse4_2")
+                        "fma4" -> arrayOf("-mfma4") + flagsFor("sse4_2")
+                        "sse2" -> arrayOf("-msse2")
+                        "sse3" -> arrayOf("-msse3") + flagsFor("sse2")
+                        "sse4_1" -> arrayOf("-msse4.1") + flagsFor("sse3")
+                        "sse4_2" -> arrayOf("-msse4.2") + flagsFor("sse4_1")
+                        "ssse3" -> arrayOf("-mssse3") + flagsFor("sse3")
 
-                    for ((file, flags) in extensions) {
+                        // == ARM ==
+                        "i8mm_neon64" -> arrayOf<String>() + flagsFor("neon64")  // TODO: Figure out this part
+                        "neon64" -> arrayOf<String>() + flagsFor("neon")  // NEON is supposedly enabled by default?
+                        "neon" -> arrayOf()
+                        "sve_128" -> arrayOf("-msve-vector-bits=128")
+                        "sve_256" -> arrayOf("-msve-vector-bits=256")
+                        "sve_512" -> arrayOf("-msve-vector-bits=512")
+                        else -> throw IllegalArgumentException("Unknown extension: $ext")
+                    }
+
+
+                    for (file in extensions) {
                         val task = tasks.register<KonanCompileTask>("$file${target.name.capitalized()}", target.konanTarget).apply {
                             configure {
                                 files.from(
@@ -144,7 +179,7 @@ kotlin {
                                 arguments.addAll(
                                     "-c", "-o", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath,
                                     "-fPIC", "-O2",
-                                    *flags,
+                                    *flagsFor(file),
                                     *includes.map { include -> "-I${projectDir.resolve(include).absolutePath}" }.toTypedArray(),
                                 )
 

@@ -6,7 +6,30 @@
 constexpr std::size_t simd_size = xsimd::batch<double>::size;
 
 #if defined(__x86_64__)
-using arch_list = xsimd::all_x86_architectures;
+using arch_list = xsimd::arch_list<
+    // xsimd::avx512vnni<xsimd::avx512vbmi>,
+    xsimd::avx512vbmi,
+    xsimd::avx512ifma,
+    xsimd::avx512pf,
+    xsimd::avx512vnni<xsimd::avx512bw>,
+    xsimd::avx512bw,
+    xsimd::avx512er,
+    xsimd::avx512dq,
+    xsimd::avx512cd,
+    xsimd::avx512f,
+    // xsimd::avxvnni,
+    xsimd::fma3<xsimd::avx2>,
+    xsimd::avx2,
+    xsimd::fma3<xsimd::avx>,
+    xsimd::avx,
+    xsimd::fma4,
+    xsimd::fma3<xsimd::sse4_2>,
+    xsimd::sse4_2,
+    xsimd::sse4_1,
+    xsimd::ssse3,
+    xsimd::sse3,
+    xsimd::sse2
+>;
 #elif defined(__aarch64__)
 using arch_list = xsimd::all_arm_architectures;
 #else
