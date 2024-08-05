@@ -31,7 +31,14 @@ using arch_list = xsimd::arch_list<
     xsimd::sse2
 >;
 #elif defined(__aarch64__)
-using arch_list = xsimd::all_arm_architectures;
+using arch_list = xsimd::arch_list<
+    xsimd::detail::sve<512>,
+    xsimd::detail::sve<256>,
+    xsimd::detail::sve<128>,
+//    xsimd::i8mm<xsimd::neon64>,
+    xsimd::neon64,
+    xsimd::neon
+>;
 #else
 #error "Unsupported architecture"
 #endif
