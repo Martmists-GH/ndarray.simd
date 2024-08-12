@@ -7,7 +7,7 @@ constexpr std::size_t simd_size = xsimd::batch<double>::size;
 
 #if defined(__x86_64__)
 using arch_list = xsimd::arch_list<
-    // xsimd::avx512vnni<xsimd::avx512vbmi>,
+    xsimd::avx512vnni<xsimd::avx512vbmi>,
     xsimd::avx512vbmi,
     xsimd::avx512ifma,
     xsimd::avx512pf,
