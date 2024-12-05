@@ -112,7 +112,7 @@ kotlin {
                             "avx512vnni_avx512bw",
                             "avx512vnni_avx512vbmi",
                             "avx",
-//                        "avxvnni, // Not yet supported by Konan (as of 2.0.0)
+                            "avxvnni",
                             "fma3_avx2",
                             "fma3_avx",
                             "fma3_sse4_2",
@@ -160,7 +160,7 @@ kotlin {
 
                         // == ARM ==
                         "i8mm_neon64" -> arrayOf<String>() + flagsFor("neon64")  // TODO: Figure out this part
-                        "neon64" -> arrayOf("-mfloat-abi=softfp", "-mfpu=neon") + flagsFor("neon")  // NEON is supposedly enabled by default?
+                        "neon64" -> arrayOf("-mfloat-abi=softfp", "-mfpu=neon")  // NEON is supposedly enabled by default?
                         "sve_128" -> arrayOf("-msve-vector-bits=128")
                         "sve_256" -> arrayOf("-msve-vector-bits=256")
                         "sve_512" -> arrayOf("-msve-vector-bits=512")
