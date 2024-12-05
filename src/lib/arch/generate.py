@@ -9,7 +9,6 @@ archs = [
     "xsimd::avx512dq",
     "xsimd::avx512cd",
     "xsimd::avx512f",
-    "xsimd::avxvnni",
     "xsimd::fma3<xsimd::avx2>",
     "xsimd::avx2",
     "xsimd::fma3<xsimd::avx>",
@@ -21,7 +20,6 @@ archs = [
     "xsimd::ssse3",
     "xsimd::sse3",
     "xsimd::sse2",
-    "xsimd::detail::sve_vector_type<double>",
     "xsimd::neon64",
 ]
 

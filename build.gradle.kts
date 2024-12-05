@@ -126,7 +126,6 @@ kotlin {
                     } else {
                         listOf(
                             "neon64",
-                            "sve",
                         )
                     }
 
@@ -144,7 +143,6 @@ kotlin {
                         "avx512vnni_avx512bw" -> arrayOf("-mavx512vnni") + flagsFor("avx512bw")
                         "avx512vnni_avx512vbmi" -> arrayOf("-mavx512vnni") + flagsFor("avx512vbmi")
                         "avx" -> arrayOf("-mavx")
-                        "avxvnni" -> arrayOf("-mavxvnni") + flagsFor("avx2")
                         "fma3_avx2" -> arrayOf("-mfma") + flagsFor("avx2")
                         "fma3_avx" -> arrayOf("-mfma") + flagsFor("avx")
                         "fma3_sse4_2" -> arrayOf("-mfma") + flagsFor("sse4_2")
@@ -157,7 +155,6 @@ kotlin {
 
                         // == ARM ==
                         "neon64" -> arrayOf("-mfloat-abi=softfp", "-mfpu=neon")  // NEON is supposedly enabled by default?
-                        "sve" -> arrayOf<String>()
                         else -> throw IllegalArgumentException("Unknown extension: $ext")
                     }
 
