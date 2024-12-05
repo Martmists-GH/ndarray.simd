@@ -112,7 +112,6 @@ kotlin {
                             "avx512vnni_avx512bw",
                             "avx512vnni_avx512vbmi",
                             "avx",
-                            "avxvnni",
                             "fma3_avx2",
                             "fma3_avx",
                             "fma3_sse4_2",
