@@ -90,6 +90,9 @@ kotlin {
                         "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/",
                         "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/",
                         "-I~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/",
+                        "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/",
+                        "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/",
+                        "-isysroot~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/",
                     )
 
                     if (target.name.startsWith("macos")) {
@@ -147,7 +150,6 @@ kotlin {
                                 arguments.addAll(
                                     "-c", "-o", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath,
                                     "-fPIC", "-O2",
-                                    "-lm",
                                     *flagsFor(file),
                                     *includes.map { include -> "-I${projectDir.resolve(include).absolutePath}" }.toTypedArray(),
                                 )
