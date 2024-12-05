@@ -12,8 +12,8 @@ abstract class KonanCompileTask @Inject constructor(
 ) : AbstractExecTask<KonanCompileTask>(KonanCompileTask::class.java), UsesKotlinNativeBundleBuildService {
 
     @get:Nested
-    internal val kotlinNativeProvider: Provider<KotlinNativeProvider> = project.provider {
-        KotlinNativeProvider(project, konanTarget, kotlinNativeBundleBuildService)
+    internal val kotlinNativeProvider: Provider<KotlinNativeFromToolchainProvider> = project.provider {
+        KotlinNativeFromToolchainProvider(project, konanTarget, kotlinNativeBundleBuildService)
     }
 
     @get:OutputDirectory
