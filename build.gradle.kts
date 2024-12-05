@@ -101,16 +101,6 @@ kotlin {
                     val extensions = if (target.name.endsWith("X64")) {
                         listOf(
                             "avx2",
-                            "avx512bw",
-                            "avx512cd",
-                            "avx512dq",
-                            "avx512er",
-                            "avx512f",
-                            "avx512ifma",
-                            "avx512pf",
-                            "avx512vbmi",
-                            "avx512vnni_avx512bw",
-                            "avx512vnni_avx512vbmi",
                             "avx",
                             "fma3_avx2",
                             "fma3_avx",
@@ -131,16 +121,6 @@ kotlin {
                     fun flagsFor(ext: String): Array<String> = when (ext) {
                         // == X86 ==
                         "avx2" -> arrayOf("-mavx2") + flagsFor("avx")
-                        "avx512bw" -> arrayOf("-mavx512bw") + flagsFor("avx512dq")
-                        "avx512cd" -> arrayOf("-mavx512cd") + flagsFor("avx512f")
-                        "avx512dq" -> arrayOf("-mavx512dq") + flagsFor("avx512cd")
-                        "avx512er" -> arrayOf("-mavx512er") + flagsFor("avx512cd")
-                        "avx512f" -> arrayOf("-mavx512f")
-                        "avx512ifma" -> arrayOf("-mavx512ifma") + flagsFor("avx512bw")
-                        "avx512pf" -> arrayOf("-mavx512pf") + flagsFor("avx512er")
-                        "avx512vbmi" -> arrayOf("-mavx512vbmi") + flagsFor("avx512ifma")
-                        "avx512vnni_avx512bw" -> arrayOf("-mavx512vnni") + flagsFor("avx512bw")
-                        "avx512vnni_avx512vbmi" -> arrayOf("-mavx512vnni") + flagsFor("avx512vbmi")
                         "avx" -> arrayOf("-mavx")
                         "fma3_avx2" -> arrayOf("-mfma") + flagsFor("avx2")
                         "fma3_avx" -> arrayOf("-mfma") + flagsFor("avx")
