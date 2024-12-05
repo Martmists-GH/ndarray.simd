@@ -37,7 +37,6 @@ using arch_list = xsimd::arch_list<
     xsimd::detail::sve<128>,
 //    xsimd::i8mm<xsimd::neon64>,
     xsimd::neon64,
-    xsimd::neon
 >;
 #else
 #error "Unsupported architecture"
@@ -84,7 +83,6 @@ extern template ret name::operator()<xsimd::detail::sve<256>>(xsimd::detail::sve
 extern template ret name::operator()<xsimd::detail::sve<128>>(xsimd::detail::sve<128>, __VA_ARGS__);                           \
 extern template ret name::operator()<xsimd::i8mm<xsimd::neon64>>(xsimd::i8mm<xsimd::neon64>, __VA_ARGS__);                     \
 extern template ret name::operator()<xsimd::neon64>(xsimd::neon64, __VA_ARGS__);                                               \
-extern template ret name::operator()<xsimd::neon>(xsimd::neon, __VA_ARGS__);                                                   \
 template <class Arch>                                                                                                          \
 ret name::operator()(Arch, __VA_ARGS__)
 #endif

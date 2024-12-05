@@ -26,7 +26,6 @@ archs = [
     "xsimd::detail::sve<128>",
     "xsimd::i8mm<xsimd::neon64>",
     "xsimd::neon64",
-    "xsimd::neon",
 ]
 
 with open("template.cpp", "r") as fp:
