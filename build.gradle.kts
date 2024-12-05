@@ -147,6 +147,7 @@ kotlin {
                                 arguments.addAll(
                                     "-c", "-o", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath,
                                     "-fPIC", "-O2",
+                                    "-lm",
                                     *flagsFor(file),
                                     *includes.map { include -> "-I${projectDir.resolve(include).absolutePath}" }.toTypedArray(),
                                 )
