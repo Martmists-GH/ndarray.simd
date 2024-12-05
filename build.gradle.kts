@@ -126,9 +126,7 @@ kotlin {
                     } else {
                         listOf(
                             "neon64",
-                            "sve_128",
-                            "sve_256",
-                            "sve_512",
+                            "sve",
                         )
                     }
 
@@ -158,11 +156,8 @@ kotlin {
                         "ssse3" -> arrayOf("-mssse3") + flagsFor("sse3")
 
                         // == ARM ==
-                        "i8mm_neon64" -> arrayOf<String>() + flagsFor("neon64")  // TODO: Figure out this part
                         "neon64" -> arrayOf("-mfloat-abi=softfp", "-mfpu=neon")  // NEON is supposedly enabled by default?
-                        "sve_128" -> arrayOf("-msve-vector-bits=128")
-                        "sve_256" -> arrayOf("-msve-vector-bits=256")
-                        "sve_512" -> arrayOf("-msve-vector-bits=512")
+                        "sve" -> arrayOf<String>()
                         else -> throw IllegalArgumentException("Unknown extension: $ext")
                     }
 

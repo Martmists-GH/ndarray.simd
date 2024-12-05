@@ -21,9 +21,7 @@ archs = [
     "xsimd::ssse3",
     "xsimd::sse3",
     "xsimd::sse2",
-    "xsimd::detail::sve<512>",
-    "xsimd::detail::sve<256>",
-    "xsimd::detail::sve<128>",
+    "xsimd::detail::sve_vector_type<double>",
     "xsimd::neon64",
 ]
 
