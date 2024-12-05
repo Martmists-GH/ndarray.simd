@@ -24,7 +24,6 @@ archs = [
     "xsimd::detail::sve<512>",
     "xsimd::detail::sve<256>",
     "xsimd::detail::sve<128>",
-    "xsimd::i8mm<xsimd::neon64>",
     "xsimd::neon64",
 ]
 

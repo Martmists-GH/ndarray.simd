@@ -125,7 +125,6 @@ kotlin {
                         )
                     } else {
                         listOf(
-                            "i8mm_neon64",  // Similar error to avx512vnni_avx512vbmi
                             "neon64",
                             "sve_128",
                             "sve_256",
