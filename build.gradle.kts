@@ -145,13 +145,17 @@ kotlin {
 
 
                     for (file in extensions) {
+                        val outFile = layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath
+
                         val task = tasks.register<KonanCompileTask>("$file${target.name.capitalized()}", target.konanTarget).apply {
                             configure {
+                                outputs.file(outFile)
+
                                 files.from(
                                     projectDir.resolve("src/lib/arch/$file.cpp"),
                                 )
                                 arguments.addAll(
-                                    "-c", "-o", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath,
+                                    "-c", "-o", outFile,
                                     "-fPIC", "-O2",
                                     *flagsFor(file),
                                     *includes.map { include -> "-I${projectDir.resolve(include).absolutePath}" }.toTypedArray(),
@@ -163,9 +167,9 @@ kotlin {
                             }
                         }
 
-                        extraOpts("-Xsource-compiler-option", "-o", "-Xsource-compiler-option", layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.absolutePath)
+                        tasks.named(interopProcessingTaskName, org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
+                            linkerOpts(outFile)
 
-                        tasks.named(interopProcessingTaskName) {
                             dependsOn(task)
                         }
                     }
@@ -173,13 +177,48 @@ kotlin {
             }
         }
     }
+
+    sourceSets {
+        commonTest {
+            dependencies {
+                api(kotlin("test"))
+            }
+        }
+    }
 }
 
 tasks {
     withType<KotlinNativeCompile> {
+        @Suppress("INVISIBLE_MEMBER")
+        val cinteropName = konanTarget.family.toString().lowercase() + konanTarget.architecture.toString()
+
         compilerOptions {
             if (!target.startsWith("mingw")) {
                 freeCompilerArgs.add("-Xbinary=sourceInfoType=libbacktrace")
+
+                val extensions = if (name.endsWith("X64")) {
+                    listOf(
+                        "avx2",
+                        "avx",
+                        "fma3_avx2",
+                        "fma3_avx",
+                        "fma3_sse4_2",
+                        "fma4",
+                        "sse2",
+                        "sse3",
+                        "sse4_1",
+                        "sse4_2",
+                        "ssse3",
+                    )
+                } else {
+                    listOf(
+                        "neon64",
+                    )
+                }
+                for (bin in extensions) {
+                    val path = layout.buildDirectory.file("cinterop/$cinteropName/$bin.o").get().asFile.absolutePath
+                    freeCompilerArgs.addAll("-linker-option", path)
+                }
             }
 
             optIn = listOf(
