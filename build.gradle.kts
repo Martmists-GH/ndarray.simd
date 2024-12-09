@@ -26,8 +26,11 @@ kotlin {
             linuxArm64(),
             mingwX64(),
 //            mingwArm64(),
-            macosX64(),
-            macosArm64(),
+
+            // I can't be bothered to fix these two tbh
+            // Feel free to open a PR
+//            macosX64(),
+//            macosArm64(),
         )
     } else {
         when (val osArch = System.getProperty("os.arch")) {
