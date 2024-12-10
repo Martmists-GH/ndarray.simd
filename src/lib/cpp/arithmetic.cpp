@@ -6,47 +6,15 @@ extern "C" {
     }
 
     void vec_add_vec(double* a, double* b, int n) {
-        std::size_t size = n - n % simd_size;
-
-        for (std::size_t i = 0; i < size; i += simd_size) {
-            auto va = xsimd::load_unaligned(&a[i]);
-            auto vb = xsimd::load_unaligned(&b[i]);
-            auto res = va + vb;
-            xsimd::store_unaligned(&a[i], res);
-        }
-
-        for (std::size_t i = size; i < n; ++i) {
-            a[i] = a[i] + b[i];
-        }
+        _vec_add_vec_dispatcher(a, b, n);
     }
 
     void vec_sub_scalar(double* a, double b, int n) {
-        std::size_t size = n - n % simd_size;
-
-        for (std::size_t i = 0; i < size; i += simd_size) {
-            auto va = xsimd::load_unaligned(&a[i]);
-            auto res = va - b;
-            xsimd::store_unaligned(&a[i], res);
-        }
-
-        for (std::size_t i = size; i < n; ++i) {
-            a[i] = a[i] - b;
-        }
+        _vec_sub_scalar_dispatcher(a, b, n);
     }
 
     void vec_sub_vec(double* a, double* b, int n) {
-        std::size_t size = n - n % simd_size;
-
-        for (std::size_t i = 0; i < size; i += simd_size) {
-            auto va = xsimd::load_unaligned(&a[i]);
-            auto vb = xsimd::load_unaligned(&b[i]);
-            auto res = va - vb;
-            xsimd::store_unaligned(&a[i], res);
-        }
-
-        for (std::size_t i = size; i < n; ++i) {
-            a[i] = a[i] - b[i];
-        }
+        _vec_sub_vec_dispatcher(a, b, n);
     }
 
     void vec_mul_scalar(double* a, double b, int n) {

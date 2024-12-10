@@ -37,7 +37,16 @@ jobs:
       - name: Gradle Build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Pproduction=true build --scan
+          arguments: -Pproduction=true build
+
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
 
       - name: Gradle Publish
         uses: gradle/gradle-build-action@v2
