@@ -1,6 +1,7 @@
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.tooling.core.emptyExtras
 
 plugins {
     kotlin("multiplatform")
@@ -24,7 +25,7 @@ kotlin {
         listOf(
             linuxX64(),
             linuxArm64(),
-            mingwX64(),
+//            mingwX64(),
 //            mingwArm64(),
 
             // I can't be bothered to fix these two tbh
@@ -145,15 +146,15 @@ kotlin {
 
 
                     for (file in extensions) {
+                        val inFile = projectDir.resolve("src/lib/arch/$file.cpp")
                         val outFile = layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath
 
                         val task = tasks.register<KonanCompileTask>("$file${target.name.capitalized()}", target.konanTarget).apply {
                             configure {
                                 outputs.file(outFile)
+                                inputs.file(inFile)
 
-                                files.from(
-                                    projectDir.resolve("src/lib/arch/$file.cpp"),
-                                )
+                                files.from(inFile)
                                 arguments.addAll(
                                     "-c", "-o", outFile,
                                     "-fPIC", "-O2",
@@ -190,7 +191,7 @@ kotlin {
 tasks {
     withType<KotlinNativeCompile> {
         @Suppress("INVISIBLE_MEMBER")
-        val cinteropName = konanTarget.family.toString().lowercase() + konanTarget.architecture.toString()
+        val cinteropName = konanTarget.family.toString().lowercase() + konanTarget.architecture.toString().lowercase().capitalized()
 
         compilerOptions {
             if (!target.startsWith("mingw")) {
