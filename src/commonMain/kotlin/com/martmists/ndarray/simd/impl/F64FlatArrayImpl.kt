@@ -219,6 +219,12 @@ internal open class F64FlatArrayImpl internal constructor(
         return res
     }
 
+    override fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array {
+        check(axis == 0) { "axis out of bounds: $axis" }
+
+        return F64Array.of(reduce(operation))
+    }
+
     override fun coerceInPlace(min: Double, max: Double) = transformInPlace { it.coerceIn(min, max) }
     override fun expInPlace() = transformInPlace(::exp)
     override fun expm1InPlace() = transformInPlace(::expm1)
@@ -239,6 +245,8 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun timesAssign(other: Double) = transformInPlace { it * other }
     override fun divAssign(other: F64Array) = zipTransformInPlace(other, Double::div)
     override fun divAssign(other: Double) = transformInPlace { it / other }
+    override fun remAssign(other: F64Array) = zipTransformInPlace(other, Double::rem)
+    override fun remAssign(other: Double) = transformInPlace { it % other }
     override fun absInPlace() = transformInPlace(Double::absoluteValue)
     override fun ltInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a < b) 1.0 else 0.0 }
     override fun ltInPlace(other: Double) = transformInPlace { if (it < other) 1.0 else 0.0 }

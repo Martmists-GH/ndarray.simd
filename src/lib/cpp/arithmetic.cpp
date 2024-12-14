@@ -33,6 +33,14 @@ extern "C" {
         _vec_div_vec_dispatcher(a, b, n);
     }
 
+    void vec_rem_scalar(double* a, double b, int n) {
+        _vec_rem_scalar_dispatcher(a, b, n);
+    }
+
+    void vec_rem_vec(double* a, double* b, int n) {
+        _vec_rem_vec_dispatcher(a, b, n);
+    }
+
     void vec_negate(double* a, int n) {
         _vec_negate_dispatcher(a, n);
     }

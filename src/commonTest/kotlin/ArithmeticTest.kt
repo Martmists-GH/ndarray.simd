@@ -69,6 +69,22 @@ class ArithmeticTest {
     }
 
     @Test
+    fun `Test Array rem Array`() {
+        val arr1 = F64LargeDenseFlatArrayImpl(DoubleArray(F64Array.simdSize) { 5.0 }, 0, F64Array.simdSize)
+        val arr2 = F64LargeDenseFlatArrayImpl(DoubleArray(F64Array.simdSize) { 3.0 }, 0, F64Array.simdSize)
+        val result = arr1 % arr2
+        assertContentEquals(result.toDoubleArray(), DoubleArray(F64Array.simdSize) { 2.0 })
+    }
+
+    @Test
+    fun `Test Array rem Scalar`() {
+        val arr = F64LargeDenseFlatArrayImpl(DoubleArray(F64Array.simdSize) { 5.0 }, 0, F64Array.simdSize)
+        val scalar = 3.0
+        val result = arr % scalar
+        assertContentEquals(result.toDoubleArray(), DoubleArray(F64Array.simdSize) { 2.0 })
+    }
+
+    @Test
     fun `Test Array negate`() {
         val arr1 = F64LargeDenseFlatArrayImpl(DoubleArray(F64Array.simdSize) { 1.0 }, 0, F64Array.simdSize)
         val result = -arr1

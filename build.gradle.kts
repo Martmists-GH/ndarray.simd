@@ -147,6 +147,7 @@ kotlin {
 
                         val task = tasks.register<KonanCompileTask>("compileSimd${file.capitalized()}${target.name.capitalized()}", target.konanTarget).apply {
                             configure {
+                                inputs.dir(project.projectDir.resolve("src/lib"))
                                 outputs.file(outFile)
 
                                 files.from(inFile)

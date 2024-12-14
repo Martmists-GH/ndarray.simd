@@ -75,6 +75,15 @@ internal class F64LargeDenseFlatArrayImpl(
         }
     }
     override fun divAssign(other: Double) = NativeSpeedup.vecDivScalar(data, offset, length, other)
+    override fun remAssign(other: F64Array) {
+        if (other is F64LargeDenseFlatArrayImpl) {
+            checkShape(other)
+            NativeSpeedup.vecRemVec(data, offset, length, other.data, other.offset)
+        } else {
+            super.divAssign(other)
+        }
+    }
+    override fun remAssign(other: Double) = NativeSpeedup.vecRemScalar(data, offset, length, other)
     override fun absInPlace() = NativeSpeedup.vecAbs(data, offset, length)
 
     override fun ltInPlace(other: F64Array) {

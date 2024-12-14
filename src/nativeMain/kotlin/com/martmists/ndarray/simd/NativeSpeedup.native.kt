@@ -60,6 +60,20 @@ internal actual object NativeSpeedup {
         }
     }
 
+    actual fun vecRemVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
+        a.usePinned { pinA ->
+            b.usePinned { pinB ->
+                simd.vec_rem_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize)
+            }
+        }
+    }
+
+    actual fun vecRemScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
+        a.usePinned { pinA ->
+            simd.vec_rem_scalar(pinA.addressOf(aOffset), b, aSize)
+        }
+    }
+
     actual fun vecNegate(a: DoubleArray, aOffset: Int, aSize: Int) {
         a.usePinned { pinA ->
             simd.vec_negate(pinA.addressOf(aOffset), aSize)

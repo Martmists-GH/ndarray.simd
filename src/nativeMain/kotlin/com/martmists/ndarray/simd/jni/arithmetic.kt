@@ -116,6 +116,33 @@ fun jni_vec_div_scalar(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdouble
     }
 }
 
+@CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecRemVec")
+fun jni_vec_rem_vec(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint, b: jdoubleArray, bOffset: jint) {
+    memScoped {
+        val arrA = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, a, null)!!.reinterpret<DoubleVar>()
+        val refA = interpretCPointer<DoubleVar>(arrA.rawValue + aOffset * sizeOf<DoubleVar>())
+        val arrB = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, b, null)!!.reinterpret<DoubleVar>()
+        val refB = interpretCPointer<DoubleVar>(arrB.rawValue + bOffset * sizeOf<DoubleVar>())
+
+        vec_rem_vec(refA, refB, aSize)
+
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical !!.invoke(env, b, arrB, 0)
+    }
+}
+
+@CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecRemScalar")
+fun jni_vec_rem_scalar(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint, b: jdouble) {
+    memScoped {
+        val arrA = env.pointed.pointed!!.GetPrimitiveArrayCritical!!.invoke(env, a, null)!!.reinterpret<DoubleVar>()
+        val refA = interpretCPointer<DoubleVar>(arrA.rawValue + aOffset * sizeOf<DoubleVar>())
+
+        vec_rem_scalar(refA, b, aSize)
+
+        env.pointed.pointed!!.ReleasePrimitiveArrayCritical!!.invoke(env, a, arrA, 0)
+    }
+}
+
 @CName("Java_com_martmists_ndarray_simd_NativeSpeedup_vecNegate")
 fun jni_vec_negate(env: CPointer<JNIEnvVar>, thisObject: jobject, a: jdoubleArray, aOffset: jint, aSize: jint) {
     memScoped {

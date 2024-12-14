@@ -331,6 +331,16 @@ interface F64Array {
     fun reduce(operation: (Double, Double) -> Double): Double
 
     /**
+     * Reduces the array with an operation along the given axis
+     *
+     * @param axis the axis to reduce
+     * @param operation the operation
+     * @return a new array containing the reduced values
+     * @since 1.1.1
+     */
+    fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array
+
+    /**
      * Computes e^x for each element in the array in place.
      *
      * @see kotlin.math.exp
@@ -614,6 +624,38 @@ interface F64Array {
      * @return the quotient of the array and the scalar
      */
     operator fun div(other: Double): F64Array = copy().apply { divAssign(other) }
+
+    /**
+     * Divides this array by another array in plac and takes the remainder.
+     *
+     * @param other the other array, must have the same shape as this array
+     * @since 1.1.1
+     */
+    operator fun remAssign(other: F64Array) = zipTransformInPlace(other) { a, b -> a % b }
+
+    /**
+     * Divides this array by another array and takes the remainder. Both arrays must have the same shape.
+     *
+     * @param other the other array, must have the same shape as this array
+     * @since 1.1.1
+     */
+    operator fun rem(other: F64Array) = copy().apply { remAssign(other) }
+
+    /**
+     * Divides each element with a scalar and takes the remainder.
+     *
+     * @param other the scalar
+     * @since 1.1.1
+     */
+    operator fun remAssign(other: Double) = transformInPlace { it % other }
+
+    /**
+     * Divides each element with a scalar and takes the remainder.
+     *
+     * @param other the scalar
+     * @since 1.1.1
+     */
+    operator fun rem(other: Double) = copy().apply { remAssign(other) }
 
     /**
      * Computes the absolute value of each element in the array in place.
@@ -1602,6 +1644,19 @@ interface F64Array {
             require(num > 0) { "num must be positive" }
             val step = (stop - start) / (num - 1)
             return F64FlatArray.of(DoubleArray(num) { start + it * step })
+        }
+
+        /**
+         * Creates an array with a linear range of values.
+         *
+         * @param range the range of values
+         * @return the created array
+         * @since 1.1.1
+         */
+        @JvmStatic
+        fun linear(range: IntRange): F64FlatArray {
+            require(!range.isEmpty()) { "range must not be empty" }
+            return linear(range.first.toDouble(), range.last.toDouble(), range.count())
         }
     }
 }

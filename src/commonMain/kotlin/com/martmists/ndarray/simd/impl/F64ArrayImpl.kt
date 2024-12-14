@@ -218,6 +218,17 @@ internal open class F64ArrayImpl internal constructor(
         return sequence.drop(1).fold(initial) { acc, f64FlatArray -> f64FlatArray.fold(acc, operation) }
     }
 
+    override fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array {
+        check(axis in 0 until nDim) { "axis out of bounds: $axis" }
+
+        val nElements = shape[axis]
+        val base = view(0, axis = axis).copy()
+        for (i in 1 until nElements) {
+            base.plusAssign(view(i, axis = axis))
+        }
+        return base
+    }
+
     override fun expInPlace() {
         unrollToFlat().forEach(F64FlatArray::expInPlace)
     }
@@ -292,6 +303,14 @@ internal open class F64ArrayImpl internal constructor(
 
     override fun divAssign(other: Double) {
         unrollToFlat().forEach { it.divAssign(other) }
+    }
+
+    override fun remAssign(other: F64Array) {
+        commonUnrollToFlat(other, F64FlatArray::divAssign)
+    }
+
+    override fun remAssign(other: Double) {
+        unrollToFlat().forEach { it.remAssign(other) }
     }
 
     override fun absInPlace() {
@@ -475,6 +494,8 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun matmul(other: F64Array): F64Array {
+        // FIXME: If both inputs are flattenable and above large dense threshold, use NativeSpeedup impl
+
         check(nDim == 2) { "matmul is only supported for 2D arrays" }
         check(other.nDim == 2) { "matmul is only supported for 2D arrays" }
         check(shape[1] == other.shape[0]) {

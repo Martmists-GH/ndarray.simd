@@ -9,6 +9,8 @@ internal expect object NativeSpeedup {
     fun vecMulScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun vecDivVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     fun vecDivScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    fun vecRemVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    fun vecRemScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun vecNegate(a: DoubleArray, aOffset: Int, aSize: Int)
     fun vecAbs(a: DoubleArray, aOffset: Int, aSize: Int)
 

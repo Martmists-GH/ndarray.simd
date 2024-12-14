@@ -34,6 +34,8 @@ internal actual object NativeSpeedup {
     actual external fun vecMulScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     actual external fun vecDivVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     actual external fun vecDivScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
+    actual external fun vecRemVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
+    actual external fun vecRemScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     actual external fun vecNegate(a: DoubleArray, aOffset: Int, aSize: Int)
     actual external fun vecAbs(a: DoubleArray, aOffset: Int, aSize: Int)
 

@@ -12,6 +12,8 @@ void vec_mul_vec(double* a, double* b, int n);
 void vec_mul_scalar(double* a, double b, int n);
 void vec_div_vec(double* a, double* b, int n);
 void vec_div_scalar(double* a, double b, int n);
+void vec_rem_vec(double* a, double* b, int n);
+void vec_rem_scalar(double* a, double b, int n);
 void vec_negate(double* a, int n);
 void vec_abs(double* a, int n);
 

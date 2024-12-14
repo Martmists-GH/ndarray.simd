@@ -17,6 +17,8 @@ template void _vec_mul_scalar::operator()<Type>(Type, double *, double, int);
 template void _vec_mul_vec::operator()<Type>(Type, double *, double *, int);
 template void _vec_div_scalar::operator()<Type>(Type, double *, double, int);
 template void _vec_div_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_rem_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_rem_vec::operator()<Type>(Type, double *, double *, int);
 template void _vec_negate::operator()<Type>(Type, double *, int);
 template void _vec_abs::operator()<Type>(Type, double *, int);
 

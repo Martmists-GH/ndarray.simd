@@ -17,6 +17,8 @@ template void _vec_mul_scalar::operator()<xsimd::neon64>(xsimd::neon64, double *
 template void _vec_mul_vec::operator()<xsimd::neon64>(xsimd::neon64, double *, double *, int);
 template void _vec_div_scalar::operator()<xsimd::neon64>(xsimd::neon64, double *, double, int);
 template void _vec_div_vec::operator()<xsimd::neon64>(xsimd::neon64, double *, double *, int);
+template void _vec_rem_scalar::operator()<xsimd::neon64>(xsimd::neon64, double *, double, int);
+template void _vec_rem_vec::operator()<xsimd::neon64>(xsimd::neon64, double *, double *, int);
 template void _vec_negate::operator()<xsimd::neon64>(xsimd::neon64, double *, int);
 template void _vec_abs::operator()<xsimd::neon64>(xsimd::neon64, double *, int);
 

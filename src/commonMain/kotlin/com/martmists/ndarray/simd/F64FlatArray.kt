@@ -210,6 +210,16 @@ interface F64FlatArray : F64Array {
     override fun div(other: Double): F64FlatArray = copy().apply { divAssign(other) }
 
     /**
+     * @see F64Array.rem
+     */
+    override fun rem(other: F64Array): F64FlatArray = copy().apply { remAssign(other) }
+
+    /**
+     * @see F64Array.rem
+     */
+    override fun rem(other: Double): F64FlatArray = copy().apply { remAssign(other) }
+
+    /**
      * @see F64Array.abs
      */
     override fun abs(): F64FlatArray = copy().apply { absInPlace() }

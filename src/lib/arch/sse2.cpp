@@ -17,6 +17,8 @@ template void _vec_mul_scalar::operator()<xsimd::sse2>(xsimd::sse2, double *, do
 template void _vec_mul_vec::operator()<xsimd::sse2>(xsimd::sse2, double *, double *, int);
 template void _vec_div_scalar::operator()<xsimd::sse2>(xsimd::sse2, double *, double, int);
 template void _vec_div_vec::operator()<xsimd::sse2>(xsimd::sse2, double *, double *, int);
+template void _vec_rem_scalar::operator()<xsimd::sse2>(xsimd::sse2, double *, double, int);
+template void _vec_rem_vec::operator()<xsimd::sse2>(xsimd::sse2, double *, double *, int);
 template void _vec_negate::operator()<xsimd::sse2>(xsimd::sse2, double *, int);
 template void _vec_abs::operator()<xsimd::sse2>(xsimd::sse2, double *, int);
 
