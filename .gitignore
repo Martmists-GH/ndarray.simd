@@ -1,5 +1,6 @@
 ### IDE
 .idea/
+cmake-build-*/
 
 ### Gradle
 .gradle/
