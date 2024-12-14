@@ -1,5 +1,6 @@
 #include "../cpp/arithmetic_priv.h"
 #include "../cpp/bitwise_priv.h"
+#include "../cpp/compare_priv.h"
 
 // Arithmetic
 template void _vec_add_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
@@ -25,3 +26,20 @@ template void _vec_lshift_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *,
 template void _vec_lshift_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
 template void _vec_rshift_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, int, int);
 template void _vec_rshift_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+
+// Compare
+template void _vec_eq_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_eq_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_neq_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_neq_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_lt_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_lt_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_gt_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_gt_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_lte_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_lte_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_gte_scalar::operator()<xsimd::avx2>(xsimd::avx2, double *, double, int);
+template void _vec_gte_vec::operator()<xsimd::avx2>(xsimd::avx2, double *, double *, int);
+template void _vec_isnan::operator()<xsimd::avx2>(xsimd::avx2, double *, int);
+template void _vec_isinf::operator()<xsimd::avx2>(xsimd::avx2, double *, int);
+template void _vec_isfinite::operator()<xsimd::avx2>(xsimd::avx2, double *, int);

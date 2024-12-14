@@ -1,5 +1,6 @@
 #include "../cpp/arithmetic_priv.h"
 #include "../cpp/bitwise_priv.h"
+#include "../cpp/compare_priv.h"
 
 // Arithmetic
 template void _vec_add_scalar::operator()<Type>(Type, double *, double, int);
@@ -25,3 +26,20 @@ template void _vec_lshift_scalar::operator()<Type>(Type, double *, int, int);
 template void _vec_lshift_vec::operator()<Type>(Type, double *, double *, int);
 template void _vec_rshift_scalar::operator()<Type>(Type, double *, int, int);
 template void _vec_rshift_vec::operator()<Type>(Type, double *, double *, int);
+
+// Compare
+template void _vec_eq_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_eq_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_neq_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_neq_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_lt_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_lt_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_gt_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_gt_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_lte_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_lte_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_gte_scalar::operator()<Type>(Type, double *, double, int);
+template void _vec_gte_vec::operator()<Type>(Type, double *, double *, int);
+template void _vec_isnan::operator()<Type>(Type, double *, int);
+template void _vec_isinf::operator()<Type>(Type, double *, int);
+template void _vec_isfinite::operator()<Type>(Type, double *, int);
