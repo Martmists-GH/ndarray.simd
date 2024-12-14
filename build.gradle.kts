@@ -1,5 +1,6 @@
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.tooling.core.emptyExtras
 
@@ -94,9 +95,6 @@ kotlin {
                         "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/",
                         "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/",
                         "-I~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/",
-                        "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/",
-                        "-isysroot/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/",
-                        "-isysroot~/.konan/dependencies/apple-llvm-20200714-macos-${if (System.getProperty("os.arch") in arrayOf("amd64", "x86_64")) "x64" else "aarch64"}-essentials/lib/clang/11.1.0/include/",
                     )
 
                     if (target.name.startsWith("macos")) {
@@ -145,14 +143,13 @@ kotlin {
                     }
 
 
-                    for (file in extensions) {
+                    val entries = extensions.map { file ->
                         val inFile = projectDir.resolve("src/lib/arch/$file.cpp")
                         val outFile = layout.buildDirectory.file("cinterop/${target.name}/$file.o").get().asFile.also { it.parentFile.mkdirs() }.absolutePath
 
-                        val task = tasks.register<KonanCompileTask>("$file${target.name.capitalized()}", target.konanTarget).apply {
+                        val task = tasks.register<KonanCompileTask>("compileSimd${file.capitalized()}${target.name.capitalized()}", target.konanTarget).apply {
                             configure {
                                 outputs.file(outFile)
-                                inputs.file(inFile)
 
                                 files.from(inFile)
                                 arguments.addAll(
@@ -168,11 +165,30 @@ kotlin {
                             }
                         }
 
-                        tasks.named(interopProcessingTaskName, org.jetbrains.kotlin.gradle.tasks.CInteropProcess::class) {
-                            linkerOpts(outFile)
+                        outFile to task
+                    }
 
-                            dependsOn(task)
+                    val arTask = tasks.register<KonanArTask>("arSimd${target.name.capitalized()}", target.konanTarget).apply {
+                        configure {
+                            outputDirectory = layout.buildDirectory.dir("static/${target.name}")
+                            outputFileName = "libsimd_impl.a"
+
+                            for ((file, task) in entries) {
+                                files.from(file)
+                                dependsOn(task)
+                            }
                         }
+                    }
+
+                    val arTaskImpl = arTask.get()
+                    this@apply.compilations["main"].compileTaskProvider.configure {
+                        compilerOptions.freeCompilerArgs.addAll(
+                            "-include-binary", "${arTaskImpl.outputDirectory.get().asFile.absolutePath}/${arTaskImpl.outputFileName.get()}"
+                        )
+                    }
+
+                    tasks.named(interopProcessingTaskName, CInteropProcess::class) {
+                        dependsOn(arTask)
                     }
                 }
             }
@@ -190,36 +206,9 @@ kotlin {
 
 tasks {
     withType<KotlinNativeCompile> {
-        @Suppress("INVISIBLE_MEMBER")
-        val cinteropName = konanTarget.family.toString().lowercase() + konanTarget.architecture.toString().lowercase().capitalized()
-
         compilerOptions {
             if (!target.startsWith("mingw")) {
                 freeCompilerArgs.add("-Xbinary=sourceInfoType=libbacktrace")
-
-                val extensions = if (name.endsWith("X64")) {
-                    listOf(
-                        "avx2",
-                        "avx",
-                        "fma3_avx2",
-                        "fma3_avx",
-                        "fma3_sse4_2",
-                        "fma4",
-                        "sse2",
-                        "sse3",
-                        "sse4_1",
-                        "sse4_2",
-                        "ssse3",
-                    )
-                } else {
-                    listOf(
-                        "neon64",
-                    )
-                }
-                for (bin in extensions) {
-                    val path = layout.buildDirectory.file("cinterop/$cinteropName/$bin.o").get().asFile.absolutePath
-                    freeCompilerArgs.addAll("-linker-option", path)
-                }
             }
 
             optIn = listOf(
