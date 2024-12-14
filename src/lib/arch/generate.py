@@ -3,7 +3,6 @@ archs = [
     "xsimd::avx2",
     "xsimd::fma3<xsimd::avx>",
     "xsimd::avx",
-    "xsimd::fma4",
     "xsimd::fma3<xsimd::sse4_2>",
     "xsimd::sse4_2",
     "xsimd::sse4_1",

@@ -379,6 +379,8 @@ interface F64Array {
      * @see kotlin.math.ln
      */
     fun logInPlace() = transformInPlace(::ln)
+    // Alias
+    fun lnInPlace() = logInPlace()
 
     /**
      * Computes ln(x) for each element in the array.
@@ -386,6 +388,8 @@ interface F64Array {
      * @return the computed array
      */
     fun log(): F64Array = copy().apply { logInPlace() }
+    // Alias
+    fun ln() = log()
 
     /**
      * Computes ln(1 + x) for each element in the array in place.

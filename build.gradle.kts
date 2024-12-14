@@ -110,7 +110,6 @@ kotlin {
                             "fma3_avx2",
                             "fma3_avx",
                             "fma3_sse4_2",
-                            "fma4",
                             "sse2",
                             "sse3",
                             "sse4_1",
@@ -130,10 +129,9 @@ kotlin {
                         "fma3_avx2" -> arrayOf("-mfma") + flagsFor("avx2")
                         "fma3_avx" -> arrayOf("-mfma") + flagsFor("avx")
                         "fma3_sse4_2" -> arrayOf("-mfma") + flagsFor("sse4_2")
-                        "fma4" -> arrayOf("-mfma4") + flagsFor("sse4_2")
                         "sse2" -> arrayOf("-msse2")
                         "sse3" -> arrayOf("-msse3") + flagsFor("sse2")
-                        "sse4_1" -> arrayOf("-msse4.1") + flagsFor("sse3")
+                        "sse4_1" -> arrayOf("-msse4.1") + flagsFor("ssse3")
                         "sse4_2" -> arrayOf("-msse4.2") + flagsFor("sse4_1")
                         "ssse3" -> arrayOf("-mssse3") + flagsFor("sse3")
 

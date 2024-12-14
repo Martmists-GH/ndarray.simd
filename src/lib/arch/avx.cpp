@@ -1,6 +1,12 @@
 #include "../cpp/arithmetic_priv.h"
 #include "../cpp/bitwise_priv.h"
 #include "../cpp/compare_priv.h"
+#include "../cpp/math_priv.h"
+#include "../cpp/misc_priv.h"
+#include "../cpp/procedure_priv.h"
+#include "../cpp/rounding_priv.h"
+#include "../cpp/trigonometry_priv.h"
+#include "../cpp/vector_priv.h"
 
 // Arithmetic
 template void _vec_add_scalar::operator()<xsimd::avx>(xsimd::avx, double *, double, int);
@@ -43,3 +49,53 @@ template void _vec_gte_vec::operator()<xsimd::avx>(xsimd::avx, double *, double 
 template void _vec_isnan::operator()<xsimd::avx>(xsimd::avx, double *, int);
 template void _vec_isinf::operator()<xsimd::avx>(xsimd::avx, double *, int);
 template void _vec_isfinite::operator()<xsimd::avx>(xsimd::avx, double *, int);
+
+// Math
+template void _vec_sqrt::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_pow::operator()<xsimd::avx>(xsimd::avx, double *, double, int);
+template void _vec_ipow::operator()<xsimd::avx>(xsimd::avx, double *, double, int);
+template void _vec_log::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_logbase::operator()<xsimd::avx>(xsimd::avx, double *, double, int);
+template void _vec_exp::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_expm1::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_log1p::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_log2::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_log10::operator()<xsimd::avx>(xsimd::avx, double *, int);
+
+// Misc
+template void _vec_copy::operator()<xsimd::avx>(xsimd::avx, double *, double *, int);
+template int _get_simd_size::operator()<xsimd::avx>(xsimd::avx);
+
+// Procedure
+template double _vec_sum::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template double _vec_min::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template double _vec_max::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template double _vec_prod::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template double _vec_var::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_coerce::operator()<xsimd::avx>(xsimd::avx, double *, int, double, double);
+
+// Rounding
+template void _vec_floor::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_ceil::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_trunc::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_round::operator()<xsimd::avx>(xsimd::avx, double *, int);
+
+// Trigonometry
+template void _vec_sin::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_cos::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_tan::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_asin::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_acos::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_atan::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_atan2::operator()<xsimd::avx>(xsimd::avx, double *, double *, int);
+template void _vec_sinh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_cosh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_tanh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_asinh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_acosh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_atanh::operator()<xsimd::avx>(xsimd::avx, double *, int);
+template void _vec_hypot::operator()<xsimd::avx>(xsimd::avx, double *, double *, int);
+
+// Vector
+template double _vec_dot::operator()<xsimd::avx>(xsimd::avx, double *, double *, int);
+template void _vec_matmul::operator()<xsimd::avx>(xsimd::avx, double *, double *, double *, int, int, int);
