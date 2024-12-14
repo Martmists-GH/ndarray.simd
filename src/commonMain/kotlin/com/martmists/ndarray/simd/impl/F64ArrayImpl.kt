@@ -21,15 +21,15 @@ internal open class F64ArrayImpl internal constructor(
 ) : F64Array {
     override val isFlattenable = unrollDim == nDim
 
-    private inline fun F64Array.unsafeIndex(r: Int, c: Int): Int {
+    internal inline fun F64Array.unsafeIndex(r: Int, c: Int): Int {
         return offset + r * strides[0] + c * strides[1]
     }
 
-    private inline fun F64Array.unsafeIndex(d: Int, r: Int, c: Int): Int {
+    internal inline fun F64Array.unsafeIndex(d: Int, r: Int, c: Int): Int {
         return offset + d * strides[0] + r * strides[1] + c * strides[2]
     }
 
-    private inline fun F64Array.unsafeIndex(indices: IntArray): Int {
+    internal inline fun F64Array.unsafeIndex(indices: IntArray): Int {
         return strides.foldIndexed(offset) { i, acc, stride -> acc + indices[i] * stride }
     }
 
@@ -224,9 +224,37 @@ internal open class F64ArrayImpl internal constructor(
         val nElements = shape[axis]
         val base = view(0, axis = axis).copy()
         for (i in 1 until nElements) {
-            base.plusAssign(view(i, axis = axis))
+            base.zipTransformInPlace(view(i, axis = axis), operation)
         }
         return base
+    }
+
+    override fun scan(operation: (Double, Double) -> Double) {
+        if (isFlattenable) {
+            return flatten().scan(operation)
+        }
+
+        var tmp: Double? = null
+        transformInPlace {
+            if (tmp == null) {
+                tmp = it
+                it
+            } else {
+                tmp = operation(tmp!!, it)
+                tmp!!
+            }
+        }
+    }
+
+    override fun scan(axis: Int, operation: (Double, Double) -> Double) {
+        check(axis in 0 until nDim) { "axis out of bounds: $axis" }
+        val nElements = shape[axis]
+        var tmp = view(0, axis = axis).copy()
+        for (i in 1 until nElements) {
+            val next = view(i, axis = axis)
+            next.zipTransformInPlace(tmp, operation)
+            tmp = next
+        }
     }
 
     override fun expInPlace() {
@@ -518,6 +546,92 @@ internal open class F64ArrayImpl internal constructor(
         check(shape[0] == shape[1]) { "Only square matrices are supported" }
 
         return F64FlatArray.create(data, offset, strides[0] + strides[1], shape[0])
+    }
+
+    internal fun minor(row: Int, col: Int): F64Array {
+        val withoutRow = when (row) {
+            0 -> slice(1, shape[0])
+            shape[0] - 1 -> slice(0, row)
+            else -> {
+                val top = slice(0, row)
+                val bottom = slice(row + 1, shape[0])
+                F64Array.concat(top, bottom)
+            }
+        }
+        val withoutCol = when (col) {
+            0 -> withoutRow.slice(1, shape[1], axis = 1)
+            shape[1] - 1 -> withoutRow.slice(0, shape[1] - 1, axis = 1)
+            else -> {
+                val left = withoutRow.slice(0, col, axis = 1)
+                val right = withoutRow.slice(col + 1, shape[1], axis = 1)
+                F64Array.concat(left, right, axis = 1)
+            }
+        }
+        return withoutCol
+    }
+
+    override fun determinant(): Double {
+        check(shape.size == 2) { "Only 2D matrices are supported" }
+        check(shape[0] == shape[1]) { "Only square matrices are supported" }
+        check(shape[0] > 1) { "Matrix must be at least 2x2" }
+
+        return when (shape[0]) {
+            2 -> this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
+            else -> {
+                // Recursively compute the determinant
+                var det = 0.0
+
+                for (j in 0 until shape[1]) {
+                    val minor = minor(0, j)
+                    val tmp = this[0, j] * minor.determinant()
+                    if (j and 1 == 0) det += tmp else det -= tmp
+                }
+                det
+            }
+        }
+    }
+
+    override fun inverse(): F64Array {
+        check(shape.size == 2) { "Only 2D matrices are supported" }
+
+        return when {
+            shape[0] == shape[1] -> {
+                if (shape[0] == 2) {
+                    val det = this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
+                    val inverse = F64Array(shape[0], shape[1])
+                    inverse[0, 0] = this[1, 1]
+                    inverse[0, 1] = -this[0, 1]
+                    inverse[1, 0] = -this[1, 0]
+                    inverse[1, 1] = this[0, 0]
+                    inverse *= (1.0 / det)
+                    return inverse
+                }
+
+                val det = this.determinant()
+                val invDet = 1.0 / det
+                val res: F64Array = F64Array.zeros(shape)
+                for (i in 0 until shape[0]) {
+                    for (j in 0 until shape[1]) {
+                        if ((i + j) % 2 == 0) {
+                            val minorMatrix = this.minor(i, j)
+                            res[j, i] = invDet * minorMatrix.determinant()
+                        } else {
+                            val minorMatrix = this.minor(i, j)
+                            res[j, i] = -invDet * minorMatrix.determinant()
+                        }
+                    }
+                }
+                res
+            }
+            shape[0] < shape[1] -> {
+                val t = transpose()
+                return t.matmul(this.matmul(t).inverse())
+            }
+            else -> {
+                val t = transpose()
+                return t.matmul(this).inverse().matmul(t)
+            }
+        }
     }
 
     override fun toString(

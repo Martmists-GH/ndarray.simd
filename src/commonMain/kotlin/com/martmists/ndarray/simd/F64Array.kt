@@ -331,7 +331,7 @@ interface F64Array {
     fun reduce(operation: (Double, Double) -> Double): Double
 
     /**
-     * Reduces the array with an operation along the given axis
+     * Reduces the array with an operation along the given axis.
      *
      * @param axis the axis to reduce
      * @param operation the operation
@@ -339,6 +339,28 @@ interface F64Array {
      * @since 1.1.1
      */
     fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array
+
+    /**
+     * Scans the array in-place with an operation.
+     * Scan is like reduce, but it saves the intermediate values.
+     * For example, cumsum might be implemented as `scan(Double::plus)`
+     *
+     * @param operation the operation
+     * @since 1.1.1
+     */
+    fun scan(operation: (Double, Double) -> Double)
+
+    /**
+     * Scans the array in-place with an operation along the given axis.
+     *
+     * Scan is like reduce, but it saves the intermediate values.
+     * For example, cumsum might be implemented as `scan(axis, Double::plus)`
+     *
+     * @param axis the axis to scan along
+     * @param operation the operation
+     * @since 1.1.1
+     */
+    fun scan(axis: Int, operation: (Double, Double) -> Double)
 
     /**
      * Computes e^x for each element in the array in place.
@@ -1339,6 +1361,23 @@ interface F64Array {
      * @return the diagonal
      */
     fun diagonal(): F64FlatArray = unsupported()
+
+    /**
+     * Returns the determination of this matrix.
+     *
+     * @return the determinant
+     * @since 1.1.1
+     */
+    fun determinant(): Double = unsupported()
+
+    /**
+     * Returns the inverse matrix.
+     * Note: for MxN matrices, it assumes a full-rank matrix.
+     *
+     * @return the inverse matrix
+     * @since 1.1.1
+     */
+    fun inverse(): F64Array = unsupported()
 
     /**
      * Computes the matrix multiplication of this array with another array.

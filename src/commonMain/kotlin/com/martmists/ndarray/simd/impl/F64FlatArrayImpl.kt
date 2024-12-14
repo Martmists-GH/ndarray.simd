@@ -225,6 +225,19 @@ internal open class F64FlatArrayImpl internal constructor(
         return F64Array.of(reduce(operation))
     }
 
+    override fun scan(operation: (Double, Double) -> Double) {
+        var tmp = unsafeGet(0)
+        for (pos in 1 until length) {
+            tmp = operation(tmp, unsafeGet(pos))
+            unsafeSet(pos, tmp)
+        }
+    }
+
+    override fun scan(axis: Int, operation: (Double, Double) -> Double) {
+        check(axis == 0) { "axis out of bounds: $axis" }
+        scan(operation)
+    }
+
     override fun coerceInPlace(min: Double, max: Double) = transformInPlace { it.coerceIn(min, max) }
     override fun expInPlace() = transformInPlace(::exp)
     override fun expm1InPlace() = transformInPlace(::expm1)
@@ -294,6 +307,10 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun hypotInPlace(other: F64Array) = zipTransformInPlace(other, ::hypot)
 
     override fun diagonal(): F64FlatArray = unsupported()
+
+    override fun determinant(): Double = unsupported()
+
+    override fun inverse(): F64Array = unsupported()
 
     override fun toDoubleArray() = DoubleArray(length) { unsafeGet(it) }
 
