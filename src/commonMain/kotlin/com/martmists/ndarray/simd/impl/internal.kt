@@ -128,7 +128,7 @@ internal fun F64FlatArray.Companion.create(
 ): F64FlatArray {
     require(size > 0) { "empty arrays not supported" }
     return if (stride == 1) {
-        if (size <= F64Array.simdSize) {
+        if (size < F64Array.simdSize) {
             F64SmallDenseFlatArrayImpl(data, offset, size)
         } else {
             F64LargeDenseFlatArrayImpl(data, offset, size)

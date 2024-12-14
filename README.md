@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.martmists.ndarray-simd:ndarray-simd:1.0.9")
+    implementation("com.martmists.ndarray-simd:ndarray-simd:1.0.10")
 }
 ```
 
@@ -22,6 +22,4 @@ As such, most of the JVM code for NDArray is mostly the same as Viktor.
 
 ### License
 
-The nativeMain and jvmMain sourcesets are licensed under the [3-Clause BSD NON-AI License](https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3), with @Martmists-GH as the copyright holder.
-
-The commonMain sourceset is mostly copied/adapted from Viktor, and as such is licensed under the [original MIT license](https://github.com/JetBrains-Research/viktor/blob/master/LICENSE), with JetBrains BioLabs as the copyright holder.
+As of 1.0.10, this project is licensed under the [3-Clause BSD NON-AI License](https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3).
