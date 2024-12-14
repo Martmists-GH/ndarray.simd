@@ -26,7 +26,7 @@ kotlin {
         listOf(
             linuxX64(),
             linuxArm64(),
-//            mingwX64(),
+            mingwX64(),
 //            mingwArm64(),
 
             // I can't be bothered to fix these two tbh
