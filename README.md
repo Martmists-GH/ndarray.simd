@@ -18,7 +18,7 @@ dependencies {
 
 I basically made this because [Viktor](https://github.com/JetBrains-Research/viktor) didn't really utilize their SIMD capabilities.
 
-As such, most of the JVM code for NDArray is mostly the same as Viktor.
+As such, most of the JVM code for NDArray is loosely based on Viktor.
 
 ### License
 
