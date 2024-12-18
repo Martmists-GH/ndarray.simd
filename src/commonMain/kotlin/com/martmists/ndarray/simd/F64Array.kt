@@ -1529,18 +1529,6 @@ interface F64Array {
         }
 
         /**
-         * Creates a new array with the given shape, filled with the given value.
-         *
-         * @param shape the shape of the array
-         * @param init the initialization value
-         * @return the created array
-         */
-        @JvmStatic
-        @JvmName("fullArray")
-        @Deprecated("Use full instead", ReplaceWith("full(*shape, init=init)"))
-        fun full(shape: IntArray, init: Double): F64Array = full(*shape, init=init)
-
-        /**
          * Creates a 2D identity matrix of the given size.
          *
          * @param size the size of the matrix
@@ -1606,17 +1594,6 @@ interface F64Array {
         fun zeros(rows: Int, cols: Int): F64TwoAxisArray = full(rows, cols, init=0.0)
 
         /**
-         * Creates a new array with the given shape, filled with zeros.
-         *
-         * @param shape the shape of the array
-         * @return the created array
-         */
-        @JvmStatic
-        @JvmName("zerosArray")
-        @Deprecated("Use zeros instead", ReplaceWith("zeros(*shape)"))
-        fun zeros(shape: IntArray): F64Array = full(*shape, init=0.0)
-
-        /**
          * Creates a new array with the given shape, filled with ones.
          *
          * @param shape the shape of the array
@@ -1635,17 +1612,6 @@ interface F64Array {
          */
         @JvmStatic
         fun ones(rows: Int, cols: Int): F64TwoAxisArray = full(rows, cols, init=1.0)
-
-        /**
-         * Creates a new array with the given shape, filled with ones.
-         *
-         * @param shape the shape of the array
-         * @return the created array
-         */
-        @JvmStatic
-        @JvmName("onesArray")
-        @Deprecated("Use ones instead", ReplaceWith("ones(*shape)"))
-        fun ones(shape: IntArray): F64Array = full(*shape, init=1.0)
 
         /**
          * Creates a new array from the given list of rows.
@@ -1702,29 +1668,6 @@ interface F64Array {
             return result
         }
 
-        // TODO: Replace Random with @JvmOverloads
-        /**
-         * Creates an array of the given shape with random values.
-         * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
-         *
-         * @param shape the shape of the array
-         * @return the created array
-         * @since 1.0.7
-         */
-        @JvmStatic
-        fun random(vararg shape: Int): F64Array = random(*shape, random = Random)
-
-        /**
-         * Creates an array of the given shape with random values.
-         * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
-         *
-         * @param rows the number of rows
-         * @param cols the number of columns
-         * @return the created array
-         * @since 1.2.0
-         */
-        fun random(rows: Int, cols: Int): F64TwoAxisArray = random(rows, cols, random = Random)
-
         /**
          * Creates an array of the given shape with random values.
          * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
@@ -1735,7 +1678,8 @@ interface F64Array {
          * @since 1.0.7
          */
         @JvmStatic
-        fun random(vararg shape: Int, random: Random): F64Array = F64FlatArray.create(DoubleArray(shape.product()) { random.nextDouble() }).reshape(*shape)
+        @JvmOverloads
+        fun random(vararg shape: Int, random: Random = Random): F64Array = F64FlatArray.create(DoubleArray(shape.product()) { random.nextDouble() }).reshape(*shape)
 
         /**
          * Creates an array of the given shape with random values.
@@ -1748,7 +1692,8 @@ interface F64Array {
          * @since 1.2.0
          */
         @JvmStatic
-        fun random(rows: Int, cols: Int, random: Random): F64TwoAxisArray = F64FlatArray.create(DoubleArray(rows * cols) { random.nextDouble() }).reshape(rows, cols)
+        @JvmOverloads
+        fun random(rows: Int, cols: Int, random: Random = Random): F64TwoAxisArray = F64FlatArray.create(DoubleArray(rows * cols) { random.nextDouble() }).reshape(rows, cols)
 
         /**
          * Creates an array with a linear range of values.
