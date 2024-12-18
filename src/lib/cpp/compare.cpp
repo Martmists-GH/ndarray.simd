@@ -1,20 +1,20 @@
 #include "compare_priv.h"
 
 extern "C" {
-    void vec_eq_scalar(double* a, double b, int n) {
-        _vec_eq_scalar_dispatcher(a, b, n);
+    void vec_eq_scalar(double* a, double b, int n, double rtol, double atol, bool allow_nan) {
+        _vec_eq_scalar_dispatcher(a, b, n, rtol, atol, allow_nan);
     }
 
-    void vec_eq_vec(double* a, double* b, int n) {
-        _vec_eq_vec_dispatcher(a, b, n);
+    void vec_eq_vec(double* a, double* b, int n, double rtol, double atol, bool allow_nan) {
+        _vec_eq_vec_dispatcher(a, b, n, rtol, atol, allow_nan);
     }
 
-    void vec_neq_scalar(double* a, double b, int n) {
-        _vec_neq_scalar_dispatcher(a, b, n);
+    void vec_neq_scalar(double* a, double b, int n, double rtol, double atol, bool allow_nan) {
+        _vec_neq_scalar_dispatcher(a, b, n, rtol, atol, allow_nan);
     }
 
-    void vec_neq_vec(double* a, double* b, int n) {
-        _vec_neq_vec_dispatcher(a, b, n);
+    void vec_neq_vec(double* a, double* b, int n, double rtol, double atol, bool allow_nan) {
+        _vec_neq_vec_dispatcher(a, b, n, rtol, atol, allow_nan);
     }
 
     void vec_lt_scalar(double* a, double b, int n) {

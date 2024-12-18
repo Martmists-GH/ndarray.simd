@@ -129,22 +129,34 @@ internal class F64LargeDenseFlatArrayImpl(
     override fun eqInPlace(other: F64Array) {
         if (other is F64LargeDenseFlatArrayImpl) {
             checkShape(other)
-            NativeSpeedup.vecEqVec(data, offset, length, other.data, other.offset)
+            val (rtol, atol) = F64Array.tolerance
+            val allowNan = F64Array.equalNan
+            NativeSpeedup.vecEqVec(data, offset, length, other.data, other.offset, rtol, atol, allowNan)
         } else {
             super.eqInPlace(other)
         }
     }
-    override fun eqInPlace(other: Double) = NativeSpeedup.vecEqScalar(data, offset, length, other)
+    override fun eqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        NativeSpeedup.vecEqScalar(data, offset, length, other, rtol, atol, allowNan)
+    }
 
     override fun neqInPlace(other: F64Array) {
         if (other is F64LargeDenseFlatArrayImpl) {
             checkShape(other)
-            NativeSpeedup.vecNeqVec(data, offset, length, other.data, other.offset)
+            val (rtol, atol) = F64Array.tolerance
+            val allowNan = F64Array.equalNan
+            NativeSpeedup.vecNeqVec(data, offset, length, other.data, other.offset, rtol, atol, allowNan)
         } else {
             super.neqInPlace(other)
         }
     }
-    override fun neqInPlace(other: Double) = NativeSpeedup.vecNeqScalar(data, offset, length, other)
+    override fun neqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        NativeSpeedup.vecNeqScalar(data, offset, length, other, rtol, atol, allowNan)
+    }
 
     override fun isNanInPlace() = NativeSpeedup.vecIsNan(data, offset, length)
     override fun isInfInPlace() = NativeSpeedup.vecIsInf(data, offset, length)

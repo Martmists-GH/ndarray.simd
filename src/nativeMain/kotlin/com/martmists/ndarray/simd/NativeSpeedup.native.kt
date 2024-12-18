@@ -162,31 +162,31 @@ internal actual object NativeSpeedup {
         }
     }
 
-    actual fun vecEqVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
+    actual fun vecEqVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int, rtol: Double, atol: Double, allowNan: Boolean) {
         a.usePinned { pinA ->
             b.usePinned { pinB ->
-                simd.vec_eq_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize)
+                simd.vec_eq_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize, rtol, atol, allowNan)
             }
         }
     }
 
-    actual fun vecEqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
+    actual fun vecEqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double, rtol: Double, atol: Double, allowNan: Boolean) {
         a.usePinned { pinA ->
-            simd.vec_eq_scalar(pinA.addressOf(aOffset), b, aSize)
+            simd.vec_eq_scalar(pinA.addressOf(aOffset), b, aSize, rtol, atol, allowNan)
         }
     }
 
-    actual fun vecNeqVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
+    actual fun vecNeqVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int, rtol: Double, atol: Double, allowNan: Boolean) {
         a.usePinned { pinA ->
             b.usePinned { pinB ->
-                simd.vec_neq_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize)
+                simd.vec_neq_vec(pinA.addressOf(aOffset), pinB.addressOf(bOffset), aSize, rtol, atol, allowNan)
             }
         }
     }
 
-    actual fun vecNeqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double) {
+    actual fun vecNeqScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double, rtol: Double, atol: Double, allowNan: Boolean) {
         a.usePinned { pinA ->
-            simd.vec_neq_scalar(pinA.addressOf(aOffset), b, aSize)
+            simd.vec_neq_scalar(pinA.addressOf(aOffset), b, aSize, rtol, atol, allowNan)
         }
     }
 

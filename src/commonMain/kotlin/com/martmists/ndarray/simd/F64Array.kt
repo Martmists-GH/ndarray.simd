@@ -827,7 +827,11 @@ interface F64Array {
      *
      * @param other the other array, must have the same shape as this array
      */
-    fun eqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a == b) 1.0 else 0.0 }
+    fun eqInPlace(other: F64Array) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan
+        zipTransformInPlace(other) { a, b -> if (abs(a - b) <= (atol + rtol * abs(b)) || (allowNan && a.isNaN() && b.isNaN())) 1.0 else 0.0 }
+    }
 
     /**
      * Compares if each element in the array is equal to another array.
@@ -842,7 +846,11 @@ interface F64Array {
      *
      * @param other the scalar
      */
-    fun eqInPlace(other: Double) = transformInPlace { if (it == other) 1.0 else 0.0 }
+    fun eqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        transformInPlace { a -> if (abs(a - other) <= (atol + rtol * abs(other)) || (allowNan && a.isNaN())) 1.0 else 0.0 }
+    }
 
     /**
      * Compares if each element in the array is equal to a scalar.
@@ -857,7 +865,11 @@ interface F64Array {
      *
      * @param other the other array, must have the same shape as this array
      */
-    fun neqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a != b) 1.0 else 0.0 }
+    fun neqInPlace(other: F64Array) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan
+        zipTransformInPlace(other) { a, b -> if (abs(a - b) <= (atol + rtol * abs(b)) || (allowNan && a.isNaN() && b.isNaN())) 0.0 else 1.0 }
+    }
 
     /**
      * Compares if each element in the array is not equal to another array.
@@ -872,7 +884,11 @@ interface F64Array {
      *
      * @param other the scalar
      */
-    fun neqInPlace(other: Double) = transformInPlace { if (it != other) 1.0 else 0.0 }
+    fun neqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        transformInPlace { a -> if (abs(a - other) <= (atol + rtol * abs(other)) || (allowNan && a.isNaN())) 0.0 else 1.0 }
+    }
 
     /**
      * Compares if each element in the array is not equal to a scalar.
@@ -1411,6 +1427,20 @@ interface F64Array {
          * Depends on the System, but usually 8 or 16.
          */
         val simdSize by lazy { NativeSpeedup.getSimdSize() * 2 }
+
+        /**
+         * The relative and absolute tolerance for eq/neq.
+         * This is implemented similar to numpy: `absolute(a - b) <= (atol + rtol * absolute(b))`
+         *
+         * @since 1.2.2
+         */
+        var tolerance = 1e-05 to 1e-08
+
+        /**
+         * Whether or not nan == nan for eq/neq.
+         * @since 1.2.2
+         */
+        var equalNan = false
 
         /**
          * Creates a new array with the specified shape.

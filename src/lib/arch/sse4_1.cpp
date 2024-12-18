@@ -36,10 +36,10 @@ template void _vec_rshift_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, doubl
 template void _vec_rshift_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int);
 
 // Compare
-template void _vec_eq_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int);
-template void _vec_eq_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int);
-template void _vec_neq_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int);
-template void _vec_neq_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int);
+template void _vec_eq_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int, double, double, bool);
+template void _vec_eq_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int, double, double, bool);
+template void _vec_neq_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int, double, double, bool);
+template void _vec_neq_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int, double, double, bool);
 template void _vec_lt_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int);
 template void _vec_lt_vec::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double *, int);
 template void _vec_gt_scalar::operator()<xsimd::sse4_1>(xsimd::sse4_1, double *, double, int);

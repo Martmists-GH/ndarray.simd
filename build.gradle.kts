@@ -266,8 +266,6 @@ if (isProduction) {
             }
         }
 
-
-
         publications {
             withType<MavenPublication> {
                 version = releaseVersion

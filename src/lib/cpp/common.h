@@ -3,8 +3,6 @@
 #include <xsimd/xsimd.hpp>
 #include "lib.h"
 
-constexpr std::size_t simd_size = xsimd::batch<double>::size;
-
 #if defined(__x86_64__)
 using arch_list = xsimd::arch_list<
     xsimd::fma3<xsimd::avx2>,
@@ -56,7 +54,5 @@ template <class Arch>                                                           
 ret name::operator()(Arch, __VA_ARGS__)
 #endif
 
-#define TRUE() batch(1.0);
-#define FALSE() batch(0.0);
-#define MAKE_TRUE() xsimd::batch(1.0)
-#define MAKE_FALSE() xsimd::batch(0.0)
+#define TRUE() batch(1.0)
+#define FALSE() batch(0.0)

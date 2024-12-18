@@ -277,10 +277,26 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun gtInPlace(other: Double) = transformInPlace { if (it > other) 1.0 else 0.0 }
     override fun gteInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a >= b) 1.0 else 0.0 }
     override fun gteInPlace(other: Double) = transformInPlace { if (it >= other) 1.0 else 0.0 }
-    override fun eqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a == b) 1.0 else 0.0 }
-    override fun eqInPlace(other: Double) = transformInPlace { if (it == other) 1.0 else 0.0 }
-    override fun neqInPlace(other: F64Array) = zipTransformInPlace(other) { a, b -> if (a != b) 1.0 else 0.0 }
-    override fun neqInPlace(other: Double) = transformInPlace { if (it != other) 1.0 else 0.0 }
+    override fun eqInPlace(other: F64Array) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan
+        zipTransformInPlace(other) { a, b -> if (abs(a - b) <= (atol + rtol * abs(b)) || (allowNan && a.isNaN() && b.isNaN())) 1.0 else 0.0 }
+    }
+    override fun eqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        transformInPlace { a -> if (abs(a - other) <= (atol + rtol * abs(other)) || (allowNan && a.isNaN())) 1.0 else 0.0 }
+    }
+    override fun neqInPlace(other: F64Array) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan
+        zipTransformInPlace(other) { a, b -> if (abs(a - b) <= (atol + rtol * abs(b)) || (allowNan && a.isNaN() && b.isNaN())) 0.0 else 1.0 }
+    }
+    override fun neqInPlace(other: Double) {
+        val (rtol, atol) = F64Array.tolerance
+        val allowNan = F64Array.equalNan && other.isNaN()
+        transformInPlace { a -> if (abs(a - other) <= (atol + rtol * abs(other)) || (allowNan && a.isNaN())) 0.0 else 1.0 }
+    }
     override fun isNanInPlace() = transformInPlace { if (it.isNaN()) 1.0 else 0.0 }
     override fun isInfInPlace() = transformInPlace { if (it.isInfinite()) 1.0 else 0.0 }
     override fun isFiniteInPlace() = transformInPlace { if (it.isFinite()) 1.0 else 0.0 }
