@@ -14,4 +14,12 @@ class VectorTest {
         val res = arr1 dot arr2
         assertEquals(res, (0 until F64Array.simdSize).sumOf { it * (it - 1.0) })
     }
+
+    @Test
+    fun `Test Array matmul Array`() {
+        val arr1 = F64Array.random(F64Array.simdSize, F64Array.simdSize)
+        val inv = arr1.inverse()
+        val res = arr1 matmul inv
+        // assertContentEquals(res.diagonal().toDoubleArray(), DoubleArray(arr1.shape.min()) { 1.0 })
+    }
 }

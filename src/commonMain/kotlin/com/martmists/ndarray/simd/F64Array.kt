@@ -150,6 +150,16 @@ interface F64Array {
     fun reshape(vararg shape: Int): F64Array = flatten().reshape(*shape)
 
     /**
+     * Reshapes the array to the specified shape.
+     *
+     * @param rows the number of rows
+     * @param cols the number of columns
+     * @return the reshaped array
+     * @since 1.2.0
+     */
+    fun reshape(rows: Int, cols: Int): F64TwoAxisArray = flatten().reshape(rows, cols)
+
+    /**
      * Flattens the array to a 1D array.
      *
      * @return a flattened [F64FlatArray]
@@ -1360,6 +1370,7 @@ interface F64Array {
      *
      * @return the diagonal
      */
+    @Deprecated("Will be moved to F64TwoAxisArray in the future")
     fun diagonal(): F64FlatArray = unsupported()
 
     /**
@@ -1368,6 +1379,7 @@ interface F64Array {
      * @return the determinant
      * @since 1.1.1
      */
+    @Deprecated("Will be moved to F64TwoAxisArray in the future")
     fun determinant(): Double = unsupported()
 
     /**
@@ -1377,12 +1389,14 @@ interface F64Array {
      * @return the inverse matrix
      * @since 1.1.1
      */
-    fun inverse(): F64Array = unsupported()
+    @Deprecated("Will be moved to F64TwoAxisArray in the future")
+    fun inverse(): F64TwoAxisArray = unsupported()
 
     /**
      * Computes the matrix multiplication of this array with another array.
      */
-    infix fun matmul(other: F64Array): F64Array = unsupported()
+    @Deprecated("Will be moved to F64TwoAxisArray in the future")
+    infix fun matmul(other: F64Array): F64TwoAxisArray = unsupported()
 
     /**
      * Returns the data from the array as a flat array.
@@ -1406,7 +1420,18 @@ interface F64Array {
          */
         @JvmStatic
         @JvmName("create")
-        operator fun invoke(vararg shape: Int) = F64FlatArray.create(DoubleArray(shape.product())).reshape(*shape)
+        operator fun invoke(vararg shape: Int): F64Array = F64FlatArray.create(DoubleArray(shape.product())).reshape(*shape)
+
+        /**
+         * Creates a new array with the specified shape.
+         *
+         * @param rows the number of rows
+         * @param cols the number of columns
+         * @since 1.2.0
+         */
+        @JvmStatic
+        @JvmName("create")
+        operator fun invoke(rows: Int, cols: Int): F64TwoAxisArray = F64FlatArray.create(DoubleArray(rows * cols)).reshape(rows, cols)
 
         /**
          * Creates a new flat array with the specified size and initializes it with the given function.
@@ -1417,11 +1442,7 @@ interface F64Array {
          */
         @JvmStatic
         @JvmName("create1D")
-        operator fun invoke(size: Int, init: (Int) -> Double): F64FlatArray = F64Array(size).apply {
-            for (i in 0 until size) {
-                this[i] = init(i)
-            }
-        } as F64FlatArray
+        operator fun invoke(size: Int, init: (Int) -> Double): F64FlatArray = F64FlatArray.of(DoubleArray(size, init))
 
         /**
          * Creates a new 2D array with the specified shape and initializes it with the given function.
@@ -1433,7 +1454,7 @@ interface F64Array {
          */
         @JvmStatic
         @JvmName("create2D")
-        operator fun invoke(numRows: Int, numColumns: Int, init: (Int, Int) -> Double) = F64Array(numRows, numColumns).apply {
+        operator fun invoke(numRows: Int, numColumns: Int, init: (Int, Int) -> Double): F64TwoAxisArray = F64Array(numRows, numColumns).apply {
             for (r in 0 until numRows) {
                 for (c in 0 until numColumns) {
                     this[r, c] = init(r, c)
@@ -1496,6 +1517,20 @@ interface F64Array {
         /**
          * Creates a new array with the given shape, filled with the given value.
          *
+         * @param rows the row count
+         * @param cols the column count
+         * @param init the initialization value
+         * @return the created array
+         * @since 1.2.0
+         */
+        @JvmStatic
+        fun full(rows: Int, cols: Int, init: Double): F64TwoAxisArray {
+            return F64FlatArray.create(DoubleArray(rows * cols).apply { fill(init) }).reshape(rows, cols)
+        }
+
+        /**
+         * Creates a new array with the given shape, filled with the given value.
+         *
          * @param shape the shape of the array
          * @param init the initialization value
          * @return the created array
@@ -1508,12 +1543,12 @@ interface F64Array {
         /**
          * Creates a 2D identity matrix of the given size.
          *
-         * @param n the size of the matrix
+         * @param size the size of the matrix
          * @return the created matrix
          */
         @JvmStatic
-        fun identity(n: Int): F64Array = zeros(n, n).apply {
-            for (i in 0 until n) {
+        fun identity(size: Int): F64TwoAxisArray = zeros(size, size).apply {
+            for (i in 0 until size) {
                 this[i, i] = 1.0
             }
         }
@@ -1525,7 +1560,7 @@ interface F64Array {
          * @return the created matrix
          */
         @JvmStatic
-        fun diagonal(values: DoubleArray): F64Array {
+        fun diagonal(values: DoubleArray): F64TwoAxisArray {
             val n = values.size
             val result = zeros(n, n)
             for (i in 0 until n) {
@@ -1541,7 +1576,7 @@ interface F64Array {
          * @return the created matrix
          */
         @JvmStatic
-        fun diagonal(values: F64Array): F64Array {
+        fun diagonal(values: F64Array): F64TwoAxisArray {
             val n = values.length
             val result = zeros(n, n)
             for (i in 0 until n) {
@@ -1558,6 +1593,17 @@ interface F64Array {
          */
         @JvmStatic
         fun zeros(vararg shape: Int): F64Array = full(*shape, init=0.0)
+
+        /**
+         * Creates a new array with the given shape, filled with zeros.
+         *
+         * @param rows the number of rows
+         * @param cols the number of columns
+         * @return the created array
+         * @since 1.2.0
+         */
+        @JvmStatic
+        fun zeros(rows: Int, cols: Int): F64TwoAxisArray = full(rows, cols, init=0.0)
 
         /**
          * Creates a new array with the given shape, filled with zeros.
@@ -1582,6 +1628,17 @@ interface F64Array {
         /**
          * Creates a new array with the given shape, filled with ones.
          *
+         * @param rows the number of rows
+         * @param cols the number of columns
+         * @return the created array
+         * @since 1.2.0
+         */
+        @JvmStatic
+        fun ones(rows: Int, cols: Int): F64TwoAxisArray = full(rows, cols, init=1.0)
+
+        /**
+         * Creates a new array with the given shape, filled with ones.
+         *
          * @param shape the shape of the array
          * @return the created array
          */
@@ -1597,7 +1654,7 @@ interface F64Array {
          * @return the created array
          */
         @JvmStatic
-        fun ofRows(rows: List<DoubleArray>): F64Array = ofRows(rows.map { F64FlatArray.of(it) })
+        fun ofRows(rows: List<DoubleArray>): F64TwoAxisArray = ofRows(rows.map { F64FlatArray.of(it) })
 
         /**
          * Creates a new array from the given list of rows.
@@ -1607,9 +1664,9 @@ interface F64Array {
          */
         @JvmStatic
         @JvmName("ofRowsArray")
-        fun ofRows(rows: List<F64Array>): F64Array {
+        fun ofRows(rows: List<F64Array>): F64TwoAxisArray {
             val args = rows.map { it.reshape(1, *it.shape) }
-            return concat(args[0], *args.slice(1 until args.size).toTypedArray(), axis = 0)
+            return concat(args[0], *args.slice(1 until args.size).toTypedArray(), axis = 0) as F64TwoAxisArray
         }
 
         /**
@@ -1645,6 +1702,7 @@ interface F64Array {
             return result
         }
 
+        // TODO: Replace Random with @JvmOverloads
         /**
          * Creates an array of the given shape with random values.
          * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
@@ -1660,13 +1718,37 @@ interface F64Array {
          * Creates an array of the given shape with random values.
          * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
          *
+         * @param rows the number of rows
+         * @param cols the number of columns
+         * @return the created array
+         * @since 1.2.0
+         */
+        fun random(rows: Int, cols: Int): F64TwoAxisArray = random(rows, cols, random = Random)
+
+        /**
+         * Creates an array of the given shape with random values.
+         * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
+         *
          * @param shape the shape of the array
-         * @param random the random number generator
+         * @param random the random source
          * @return the created array
          * @since 1.0.7
          */
         @JvmStatic
         fun random(vararg shape: Int, random: Random): F64Array = F64FlatArray.create(DoubleArray(shape.product()) { random.nextDouble() }).reshape(*shape)
+
+        /**
+         * Creates an array of the given shape with random values.
+         * The values are uniformly distributed between 0 (inclusive) and 1 (exclusive).
+         *
+         * @param rows the number of rows
+         * @param cols the number of columns
+         * @param random the random source
+         * @return the created array
+         * @since 1.2.0
+         */
+        @JvmStatic
+        fun random(rows: Int, cols: Int, random: Random): F64TwoAxisArray = F64FlatArray.create(DoubleArray(rows * cols) { random.nextDouble() }).reshape(rows, cols)
 
         /**
          * Creates an array with a linear range of values.

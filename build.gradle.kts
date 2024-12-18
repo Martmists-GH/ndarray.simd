@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.1.1"
+version = "1.2.0"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -266,9 +266,36 @@ if (isProduction) {
             }
         }
 
+
+
         publications {
             withType<MavenPublication> {
                 version = releaseVersion
+                pom {
+                    name = "NDArray.simd"
+                    description = "Kotlin/Multiplatform NDArray with SIMD optimizations and low memory footprint"
+                    url = "https://github.com/martmists-gh/ndarray.simd"
+
+                    licenses {
+                        license {
+                            name = "3-Clause BSD NON-AI License"
+                            url = "https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3"
+                            distribution = "repo"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "Martmists"
+                            name = "Martmists"
+                            url = "https://github.com/martmists-gh"
+                        }
+                    }
+
+                    scm {
+                        url = "https://github.com/martmists-gh/ndarray.simd"
+                    }
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
+import com.martmists.ndarray.simd.F64TwoAxisArray
 import kotlin.math.*
 
 internal open class F64FlatArrayImpl internal constructor(
@@ -68,6 +69,13 @@ internal open class F64FlatArrayImpl internal constructor(
                 F64Array.create(data, offset, reshaped, shape)
             }
         }
+    }
+
+    override fun reshape(rows: Int, cols: Int): F64TwoAxisArray {
+        require(rows > 0 && cols > 0) { "shape must be positive but was $rows, $cols" }
+        check(rows * cols == length) { "total size of the new array must be unchanged" }
+        val newStrides = intArrayOf(strides[0] * cols, strides[0])
+        return F64TwoAxisArray.create(rows, data, offset, newStrides, length)
     }
 
     override fun slice(from: Int, to: Int, step: Int, axis: Int): F64FlatArray = super.slice(from, to, step, axis) as F64FlatArray
@@ -310,7 +318,7 @@ internal open class F64FlatArrayImpl internal constructor(
 
     override fun determinant(): Double = unsupported()
 
-    override fun inverse(): F64Array = unsupported()
+    override fun inverse(): F64TwoAxisArray = unsupported()
 
     override fun toDoubleArray() = DoubleArray(length) { unsafeGet(it) }
 

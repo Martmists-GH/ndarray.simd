@@ -6,7 +6,6 @@ import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
 import com.martmists.ndarray.simd.NativeSpeedup
 
-// TODO: Dense array for ND?
 internal abstract class F64DenseFlatArrayBase(
     data: DoubleArray,
     offset: Int,

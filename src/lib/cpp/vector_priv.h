@@ -24,26 +24,33 @@ MAKE_SIMD(double, _vec_dot, double* a, double* b, int n) {
     return result;
 }
 
-MAKE_SIMD(void, _vec_matmul, double* a, double* b, double* c, int n, int m, int p) {
+MAKE_SIMD(void, _vec_matmul, double* a, double* b, double* c, int m, int n, int p) {
     using batch = xsimd::batch<double, Arch>;
 
-    std::size_t size = m - m % batch::size;
+    // a = mxn
+    // b = nxp
+    // c = mxp
+    // n = common size, leading dim for both (i.e. a[0] is [0, 0], a[1] is [0, 1])
+    // b is transposed to pxn
 
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < m; ++i) {
         for (int j = 0; j < p; ++j) {
             auto sum = batch(0.0);
-            std::size_t k = 0;
-            for (; k < size; k += simd_size) {
-                // Need to do unaligned load here
-                auto va = batch::load_unaligned(&a[i * m + k]);
-                auto vb = batch::load_unaligned(&b[k * p + j]);
+            int k = 0;
+
+            for (; k + batch::size <= n; k += batch::size) {
+                auto va = batch::load_unaligned(&a[i * n + k]);
+                auto vb = batch::load_unaligned(&b[j * n + k]);
                 sum += va * vb;
             }
-            double scalar_sum = xsimd::reduce_add(sum);
-            for (; k < m; ++k) {
-                scalar_sum += a[i * m + k] * b[k * p + j];
+
+            double partial_sum = xsimd::reduce_add(sum);
+
+            for (; k < n; ++k) {
+                partial_sum += a[i * n + k] * b[j * n + k];
             }
-            c[i * p + j] = scalar_sum;
+
+            c[i * p + j] = partial_sum;
         }
     }
 }

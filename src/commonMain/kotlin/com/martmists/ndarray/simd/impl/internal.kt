@@ -4,6 +4,7 @@ package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
+import com.martmists.ndarray.simd.F64TwoAxisArray
 import kotlin.math.min
 
 internal fun F64Array.view0(indices: IntArray): F64Array {
@@ -111,12 +112,18 @@ internal fun F64Array.Companion.create(
     shape: IntArray,
 ): F64Array {
     require(strides.size == shape.size) { "strides and shape size don't match" }
-    require(strides.isNotEmpty()) { "singleton arrays are not supported" }
-    return if (shape.size == 1) {
-        F64FlatArray.create(data, offset, strides.single(), shape.single())
-    } else {
-        val (unrollDim, unrollStride, unrollSize) = calculateUnroll(strides, shape)
-        F64ArrayImpl(data, offset, strides, shape, unrollDim, unrollStride, unrollSize)
+    require(shape.isNotEmpty()) { "empty arrays are not supported" }
+    return when (shape.size) {
+        1 -> {
+            F64FlatArray.create(data, offset, strides.single(), shape.single())
+        }
+        2 -> {
+            F64TwoAxisArray.create(shape[0], data, offset, strides, shape.product())
+        }
+        else -> {
+            val (unrollDim, unrollStride, unrollSize) = calculateUnroll(strides, shape)
+            F64ArrayImpl(data, offset, strides, shape, unrollDim, unrollStride, unrollSize)
+        }
     }
 }
 
@@ -136,4 +143,22 @@ internal fun F64FlatArray.Companion.create(
     } else {
         F64FlatArrayImpl(data, offset, stride, size)
     }
+}
+
+
+internal fun F64TwoAxisArray.Companion.create(
+    rows: Int,
+    data: DoubleArray,
+    offset: Int = 0,
+    strides: IntArray = intArrayOf(data.size / rows, 1),
+    size: Int = data.size
+): F64TwoAxisArray {
+    require(size > 0) { "empty arrays not supported" }
+    require(rows > 0) { "number of rows must be positive" }
+    require(size % rows == 0) { "data must fully cover the number of rows" }
+    require(strides.size == 2) { "data must have 2 strides" }
+
+    val shape = intArrayOf(rows, size / rows)
+    val (unrollDim, unrollStride, unrollSize) = calculateUnroll(strides, shape)
+    return F64TwoAxisArrayImpl(data, offset, strides, shape, unrollDim, unrollStride, unrollSize)
 }

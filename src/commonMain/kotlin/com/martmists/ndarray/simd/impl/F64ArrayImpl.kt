@@ -3,6 +3,7 @@
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.*
+import kotlin.math.abs
 
 internal open class F64ArrayImpl internal constructor(
     @get:Deprecated("This should not be accessed directly")
@@ -121,7 +122,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun copy(): F64Array {
-        return F64Array.full(*shape, init=0.0).also(this::copyTo)
+        return F64Array.zeros(*shape).also(this::copyTo)
     }
 
     override fun copyTo(other: F64Array) {
@@ -166,7 +167,6 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun transpose(ax1: Int, ax2: Int): F64Array {
-        check(nDim == 2) { "transpose is only supported for 2D arrays" }
         check(ax1 in 0 until nDim) { "axis 1 out of bounds: $ax1" }
         check(ax2 in 0 until nDim) { "axis 2 out of bounds: $ax2" }
         check(ax1 != ax2) { "axes must be different" }
@@ -221,10 +221,10 @@ internal open class F64ArrayImpl internal constructor(
     override fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array {
         check(axis in 0 until nDim) { "axis out of bounds: $axis" }
 
-        val nElements = shape[axis]
-        val base = view(0, axis = axis).copy()
-        for (i in 1 until nElements) {
-            base.zipTransformInPlace(view(i, axis = axis), operation)
+        val items = along(axis)
+        val base = items.first().copy()
+        for (next in items) {
+            base.zipTransformInPlace(next, operation)
         }
         return base
     }
@@ -248,10 +248,9 @@ internal open class F64ArrayImpl internal constructor(
 
     override fun scan(axis: Int, operation: (Double, Double) -> Double) {
         check(axis in 0 until nDim) { "axis out of bounds: $axis" }
-        val nElements = shape[axis]
-        var tmp = view(0, axis = axis).copy()
-        for (i in 1 until nElements) {
-            val next = view(i, axis = axis)
+        val items = along(axis)
+        var tmp = items.first().copy()
+        for (next in items) {
             next.zipTransformInPlace(tmp, operation)
             tmp = next
         }
@@ -521,16 +520,14 @@ internal open class F64ArrayImpl internal constructor(
         commonUnrollToFlat(other, F64FlatArray::hypotInPlace)
     }
 
-    override fun matmul(other: F64Array): F64Array {
+    override fun matmul(other: F64Array): F64TwoAxisArray {
         // FIXME: If both inputs are flattenable and above large dense threshold, use NativeSpeedup impl
-
         check(nDim == 2) { "matmul is only supported for 2D arrays" }
         check(other.nDim == 2) { "matmul is only supported for 2D arrays" }
         check(shape[1] == other.shape[0]) {
             "matmul dimensions do not match: ${shape[1]} != ${other.shape[0]}"
         }
-        val resultShape = intArrayOf(shape[0], other.shape[1])
-        val result = F64Array.full(*resultShape, init=0.0)
+        val result = F64Array.full(shape[0], other.shape[1], init=0.0)
         for (i in 0 until shape[0]) {
             for (j in 0 until other.shape[1]) {
                 for (k in 0 until shape[1]) {
@@ -575,23 +572,46 @@ internal open class F64ArrayImpl internal constructor(
         check(shape[0] == shape[1]) { "Only square matrices are supported" }
         check(shape[0] > 1) { "Matrix must be at least 2x2" }
 
-        return when (shape[0]) {
-            2 -> this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
-            else -> {
-                // Recursively compute the determinant
-                var det = 0.0
+        // TODO: Consider cleaning up with an F64Array
+        val n = shape[0]
+        val lu = Array(n) { i -> DoubleArray(n) { this[i, it] } }
+        var det = 1.0
 
-                for (j in 0 until shape[1]) {
-                    val minor = minor(0, j)
-                    val tmp = this[0, j] * minor.determinant()
-                    if (j and 1 == 0) det += tmp else det -= tmp
+        // LU Decomposition with partial pivoting
+        for (k in 0 until n) {
+            var max = 0.0
+            var maxRow = k
+            for (i in k until n) {
+                val abs = abs(lu[i][k])
+                if (abs > max) {
+                    max = abs
+                    maxRow = i
                 }
-                det
+            }
+
+            if (k != maxRow) {
+                val tmp = lu[k]
+                lu[k] = lu[maxRow]
+                lu[maxRow] = tmp
+
+                det *= -1
+            }
+
+            det *= lu[k][k]
+            if (lu[k][k] == 0.0) return 0.0
+
+            for (i in k + 1 until n) {
+                lu[i][k] /= lu[k][k]
+                for (j in k + 1 until n) {
+                    lu[i][j] -= lu[i][k] * lu[k][j]
+                }
             }
         }
+
+        return det
     }
 
-    override fun inverse(): F64Array {
+    override fun inverse(): F64TwoAxisArray {
         check(shape.size == 2) { "Only 2D matrices are supported" }
 
         return when {
@@ -609,7 +629,7 @@ internal open class F64ArrayImpl internal constructor(
 
                 val det = this.determinant()
                 val invDet = 1.0 / det
-                val res: F64Array = F64Array.zeros(shape)
+                val res = F64Array.zeros(shape[0], shape[1])
                 for (i in 0 until shape[0]) {
                     for (j in 0 until shape[1]) {
                         if ((i + j) % 2 == 0) {
