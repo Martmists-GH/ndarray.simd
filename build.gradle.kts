@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.2.1"
+version = "1.2.3"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
