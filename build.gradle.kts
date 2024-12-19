@@ -1,12 +1,16 @@
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.tooling.core.emptyExtras
 
 plugins {
     kotlin("multiplatform")
     `maven-publish`
+    id("org.jetbrains.dokka")
+    id("com.vanniktech.maven.publish")
 }
 
 group = "com.martmists.ndarray-simd"
@@ -18,6 +22,8 @@ repositories {
 }
 
 kotlin {
+    jvmToolchain(21)
+
     withSourcesJar()
 
     jvm()
@@ -246,6 +252,32 @@ if (isProduction) {
         "$version-$tag"
     }
 
+    fun MavenPom.configure() {
+        name = "NDArray.simd"
+        description = "Kotlin/Multiplatform NDArray with SIMD optimizations and low memory footprint"
+        url = "https://github.com/martmists-gh/ndarray.simd"
+
+        licenses {
+            license {
+                name = "3-Clause BSD NON-AI License"
+                url = "https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3"
+                distribution = "repo"
+            }
+        }
+
+        developers {
+            developer {
+                id = "Martmists"
+                name = "Martmists"
+                url = "https://github.com/martmists-gh"
+            }
+        }
+
+        scm {
+            url = "https://github.com/martmists-gh/ndarray.simd"
+        }
+    }
+
     publishing {
         repositories {
             maven {
@@ -258,7 +290,7 @@ if (isProduction) {
                         System.getenv("MAVEN_USER")
                     } ?: error("No maven user found")
                     password = if (project.hasProperty("mavenToken")) {
-                        project.ext["mavenToken"] as? String
+                        project.properties["mavenToken"] as? String
                     } else {
                         System.getenv("MAVEN_TOKEN")
                     } ?: error("No maven token found")
@@ -270,31 +302,19 @@ if (isProduction) {
             withType<MavenPublication> {
                 version = releaseVersion
                 pom {
-                    name = "NDArray.simd"
-                    description = "Kotlin/Multiplatform NDArray with SIMD optimizations and low memory footprint"
-                    url = "https://github.com/martmists-gh/ndarray.simd"
-
-                    licenses {
-                        license {
-                            name = "3-Clause BSD NON-AI License"
-                            url = "https://github.com/non-ai-licenses/non-ai-licenses/blob/main/NON-AI-BSD3"
-                            distribution = "repo"
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = "Martmists"
-                            name = "Martmists"
-                            url = "https://github.com/martmists-gh"
-                        }
-                    }
-
-                    scm {
-                        url = "https://github.com/martmists-gh/ndarray.simd"
-                    }
+                    configure()
                 }
             }
+        }
+    }
+
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+        coordinates(group as String, name, releaseVersion)
+        signAllPublications()
+
+        pom {
+            configure()
         }
     }
 }

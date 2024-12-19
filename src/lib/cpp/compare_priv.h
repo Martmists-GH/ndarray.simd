@@ -20,7 +20,7 @@ MAKE_SIMD(void, _vec_eq_scalar, double* a, double b, int n, double rtol, double 
     }
 
     for (std::size_t i = size; i < n; ++i) {
-        a[i] = ((abs(a[i] - b) <= delta) || (allow_nan && std::isnan(a[i]))) ? 1.0 : 0.0;
+        a[i] = ((std::abs(a[i] - b) <= delta) || (allow_nan && std::isnan(a[i]))) ? 1.0 : 0.0;
     }
 }
 
@@ -44,7 +44,7 @@ MAKE_SIMD(void, _vec_eq_vec, double* a, double* b, int n, double rtol, double at
     for (std::size_t i = size; i < n; ++i) {
         auto as = a[i];
         auto bs = b[i];
-        a[i] = ((abs(as - bs) <= (atol + rtol * std::abs(bs))) || (allow_nan && std::isnan(as) && std::isnan(bs))) ? 1.0 : 0.0;
+        a[i] = ((std::abs(as - bs) <= (atol + rtol * std::abs(bs))) || (allow_nan && std::isnan(as) && std::isnan(bs))) ? 1.0 : 0.0;
     }
 }
 
@@ -66,7 +66,7 @@ MAKE_SIMD(void, _vec_neq_scalar, double* a, double b, int n, double rtol, double
     }
 
     for (std::size_t i = size; i < n; ++i) {
-        a[i] = ((abs(a[i] - b) <= delta) || (allow_nan && std::isnan(a[i]))) ? 0.0 : 1.0;
+        a[i] = ((std::abs(a[i] - b) <= delta) || (allow_nan && std::isnan(a[i]))) ? 0.0 : 1.0;
     }
 }
 
@@ -90,7 +90,7 @@ MAKE_SIMD(void, _vec_neq_vec, double* a, double* b, int n, double rtol, double a
     for (std::size_t i = size; i < n; ++i) {
         auto as = a[i];
         auto bs = b[i];
-        a[i] = ((abs(as - bs) <= (atol + rtol * std::abs(bs))) || (allow_nan && std::isnan(as) && std::isnan(bs))) ? 0.0 : 1.0;
+        a[i] = ((std::abs(as - bs) <= (atol + rtol * std::abs(bs))) || (allow_nan && std::isnan(as) && std::isnan(bs))) ? 0.0 : 1.0;
     }
 }
 

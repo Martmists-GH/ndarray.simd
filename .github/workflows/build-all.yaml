@@ -51,4 +51,4 @@ jobs:
       - name: Gradle Publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -Pproduction=true publish
+          arguments: -Pproduction=true -PmavenCentralUsername=${{ secrets.MAVEN_CENTRAL_USER }} -PmavenCentralPassword=${{ secrets.MAVEN_CENTRAL_TOKEN }} publish
