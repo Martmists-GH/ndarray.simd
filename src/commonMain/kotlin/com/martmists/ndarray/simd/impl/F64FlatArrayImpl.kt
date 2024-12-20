@@ -330,12 +330,6 @@ internal open class F64FlatArrayImpl internal constructor(
     override fun atanhInPlace() = transformInPlace(::atanh)
     override fun hypotInPlace(other: F64Array) = zipTransformInPlace(other, ::hypot)
 
-    override fun diagonal(): F64FlatArray = unsupported()
-
-    override fun determinant(): Double = unsupported()
-
-    override fun inverse(): F64TwoAxisArray = unsupported()
-
     override fun toDoubleArray() = DoubleArray(length) { unsafeGet(it) }
 
     private fun Double.format(digits: Int): String = when {

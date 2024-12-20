@@ -1,6 +1,7 @@
 package com.martmists.ndarray.simd
 
 import com.martmists.ndarray.simd.impl.create
+import com.martmists.ndarray.simd.impl.unsupported
 
 /**
  * A 2D specialization type for [F64Array].
@@ -343,12 +344,61 @@ interface F64TwoAxisArray : F64Array {
     override fun hypot(other: F64Array): F64TwoAxisArray = copy().apply { hypotInPlace(other) }
 
     /**
+     * Returns the diagonal of the array.
+     *
+     * @return the diagonal
+     */
+    fun diagonal(): F64FlatArray
+
+    /**
+     * Returns the determination of this matrix.
+     *
+     * @return the determinant
+     * @since 1.1.1
+     */
+    fun determinant(): Double
+
+    /**
+     * Returns the inverse matrix.
+     * Note: for MxN matrices, it assumes a full-rank matrix.
+     *
+     * @return the inverse matrix
+     * @since 1.1.1
+     */
+    fun inverse(): F64TwoAxisArray
+
+    /**
+     * Computes the matrix multiplication of this array with another array.
+     * This requires `this.shape[1] == other.shape[0]`
+     */
+    infix fun matmul(other: F64TwoAxisArray): F64TwoAxisArray
+
+    /**
      * Calculates the eigenvalues and eigenvectors of this [F64TwoAxisArray] using the QR algorithm.
      *
      * @return a pair of eigenvalues as [F64FlatArray] and eigenvectors as [F64TwoAxisArray].
      * @since 1.2.0
      */
     fun eigen(): Pair<F64FlatArray, F64TwoAxisArray>
+
+    /**
+     * Performs a Complex-to-Complex FFT on this array in-place.
+     * The second axis has to be [real, imag].
+     * The resulting array is not normalized.
+     *
+     * @since 1.3.0
+     */
+    fun fftC2CInPlace()
+
+    /**
+     * Performs a Complex-to-Complex FFT on this array.
+     * The second axis has to be [real, imag].
+     * The resulting array is not normalized.
+     *
+     * @return the FFT result
+     * @since 1.3.0
+     */
+    fun fftC2C() = copy().apply { fftC2CInPlace() }
 
     companion object {
         /**

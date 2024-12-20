@@ -135,8 +135,8 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun slice(from: Int, to: Int, step: Int, axis: Int): F64Array {
+        checkAxis(axis)
         require(step > 0) { "slicing step must be positive, but was $step" }
-        require(axis in 0 until nDim) { "axis out of bounds: $axis" }
         require(from >= 0) { "slicing start index must be positive, but was $from" }
         val actualTo = if (to != -1) {
             require(to > from) { "slicing end index $to must be greater than start index $from" }
@@ -219,7 +219,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun reduce(axis: Int, operation: (Double, Double) -> Double): F64Array {
-        check(axis in 0 until nDim) { "axis out of bounds: $axis" }
+        checkAxis(axis)
 
         val items = along(axis)
         val base = items.first().copy()
@@ -247,7 +247,7 @@ internal open class F64ArrayImpl internal constructor(
     }
 
     override fun scan(axis: Int, operation: (Double, Double) -> Double) {
-        check(axis in 0 until nDim) { "axis out of bounds: $axis" }
+        checkAxis(axis)
         val items = along(axis)
         var tmp = items.first().copy()
         for (next in items) {
@@ -518,140 +518,6 @@ internal open class F64ArrayImpl internal constructor(
 
     override fun hypotInPlace(other: F64Array) {
         commonUnrollToFlat(other, F64FlatArray::hypotInPlace)
-    }
-
-    override fun matmul(other: F64Array): F64TwoAxisArray {
-        // FIXME: If both inputs are flattenable and above large dense threshold, use NativeSpeedup impl
-        check(nDim == 2) { "matmul is only supported for 2D arrays" }
-        check(other.nDim == 2) { "matmul is only supported for 2D arrays" }
-        check(shape[1] == other.shape[0]) {
-            "matmul dimensions do not match: ${shape[1]} != ${other.shape[0]}"
-        }
-        val result = F64Array.full(shape[0], other.shape[1], init=0.0)
-        for (i in 0 until shape[0]) {
-            for (j in 0 until other.shape[1]) {
-                for (k in 0 until shape[1]) {
-                    result[i, j] += this[i, k] * other[k, j]
-                }
-            }
-        }
-        return result
-    }
-
-    override fun diagonal(): F64FlatArray {
-        check(nDim == 2) { "Only 2D arrays are supported" }
-        check(shape[0] == shape[1]) { "Only square matrices are supported" }
-
-        return F64FlatArray.create(data, offset, strides[0] + strides[1], shape[0])
-    }
-
-    internal fun minor(row: Int, col: Int): F64Array {
-        val withoutRow = when (row) {
-            0 -> slice(1, shape[0])
-            shape[0] - 1 -> slice(0, row)
-            else -> {
-                val top = slice(0, row)
-                val bottom = slice(row + 1, shape[0])
-                F64Array.concat(top, bottom)
-            }
-        }
-        val withoutCol = when (col) {
-            0 -> withoutRow.slice(1, shape[1], axis = 1)
-            shape[1] - 1 -> withoutRow.slice(0, shape[1] - 1, axis = 1)
-            else -> {
-                val left = withoutRow.slice(0, col, axis = 1)
-                val right = withoutRow.slice(col + 1, shape[1], axis = 1)
-                F64Array.concat(left, right, axis = 1)
-            }
-        }
-        return withoutCol
-    }
-
-    override fun determinant(): Double {
-        check(shape.size == 2) { "Only 2D matrices are supported" }
-        check(shape[0] == shape[1]) { "Only square matrices are supported" }
-        check(shape[0] > 1) { "Matrix must be at least 2x2" }
-
-        // TODO: Consider cleaning up with an F64Array
-        val n = shape[0]
-        val lu = Array(n) { i -> DoubleArray(n) { this[i, it] } }
-        var det = 1.0
-
-        // LU Decomposition with partial pivoting
-        for (k in 0 until n) {
-            var max = 0.0
-            var maxRow = k
-            for (i in k until n) {
-                val abs = abs(lu[i][k])
-                if (abs > max) {
-                    max = abs
-                    maxRow = i
-                }
-            }
-
-            if (k != maxRow) {
-                val tmp = lu[k]
-                lu[k] = lu[maxRow]
-                lu[maxRow] = tmp
-
-                det *= -1
-            }
-
-            det *= lu[k][k]
-            if (lu[k][k] == 0.0) return 0.0
-
-            for (i in k + 1 until n) {
-                lu[i][k] /= lu[k][k]
-                for (j in k + 1 until n) {
-                    lu[i][j] -= lu[i][k] * lu[k][j]
-                }
-            }
-        }
-
-        return det
-    }
-
-    override fun inverse(): F64TwoAxisArray {
-        check(shape.size == 2) { "Only 2D matrices are supported" }
-
-        return when {
-            shape[0] == shape[1] -> {
-                if (shape[0] == 2) {
-                    val det = this[0, 0] * this[1, 1] - this[0, 1] * this[1, 0]
-                    val inverse = F64Array(shape[0], shape[1])
-                    inverse[0, 0] = this[1, 1]
-                    inverse[0, 1] = -this[0, 1]
-                    inverse[1, 0] = -this[1, 0]
-                    inverse[1, 1] = this[0, 0]
-                    inverse *= (1.0 / det)
-                    return inverse
-                }
-
-                val det = this.determinant()
-                val invDet = 1.0 / det
-                val res = F64Array.zeros(shape[0], shape[1])
-                for (i in 0 until shape[0]) {
-                    for (j in 0 until shape[1]) {
-                        if ((i + j) % 2 == 0) {
-                            val minorMatrix = this.minor(i, j)
-                            res[j, i] = invDet * minorMatrix.determinant()
-                        } else {
-                            val minorMatrix = this.minor(i, j)
-                            res[j, i] = -invDet * minorMatrix.determinant()
-                        }
-                    }
-                }
-                res
-            }
-            shape[0] < shape[1] -> {
-                val t = transpose()
-                return t.matmul(this.matmul(t).inverse())
-            }
-            else -> {
-                val t = transpose()
-                return t.matmul(this).inverse().matmul(t)
-            }
-        }
     }
 
     override fun toString(

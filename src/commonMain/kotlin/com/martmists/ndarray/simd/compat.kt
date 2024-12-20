@@ -18,7 +18,7 @@ operator fun Double.times(arr: F64Array): F64Array = arr.times(this)
 /**
  * @see F64Array.div
  */
-operator fun Double.div(arr: F64Array): F64Array = arr.div(this)
+operator fun Double.div(arr: F64Array): F64Array = arr.div(1 / this)
 
 /**
  * @see F64Array.expBase

@@ -162,3 +162,12 @@ internal fun F64TwoAxisArray.Companion.create(
     val (unrollDim, unrollStride, unrollSize) = calculateUnroll(strides, shape)
     return F64TwoAxisArrayImpl(data, offset, strides, shape, unrollDim, unrollStride, unrollSize)
 }
+
+internal fun Int.reverse(): Int {
+    var v = this
+    v = (v and 0x55555555 shl 1) or (v ushr 1 and 0x55555555)
+    v = (v and 0x33333333 shl 2) or (v ushr 2 and 0x33333333)
+    v = (v and 0x0f0f0f0f shl 4) or (v ushr 4 and 0x0f0f0f0f)
+    v = (v shl 24) or (v and 0xff00 shl 8) or (v ushr 8 and 0xff00) or (v ushr 24)
+    return v
+}

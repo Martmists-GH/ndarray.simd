@@ -410,11 +410,13 @@ interface F64FlatArray : F64Array {
     override fun hypot(other: F64Array): F64FlatArray = copy().apply { hypotInPlace(other) }
 
     /**
-     * Unsupported on flat arrays.
+     * Performs a Real-to-Complex FFT on this array.
+     * The output array is NOT normalized.
      *
-     * @see F64Array.diagonal
+     * @return The FFT result, where the second axis is [real, imag]
+     * @since 1.3.0
      */
-    override fun diagonal(): F64FlatArray = unsupported()
+    fun fftR2C(): F64TwoAxisArray = F64Array(shape[0], 2) { i, x -> if (x == 1) 0.0 else this[i] }.apply { fftC2CInPlace() }
 
     companion object {
         /**

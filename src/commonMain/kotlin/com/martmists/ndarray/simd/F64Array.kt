@@ -1382,39 +1382,6 @@ interface F64Array {
     fun hypot(other: F64Array): F64Array = copy().apply { hypotInPlace(other) }
 
     /**
-     * Returns the diagonal of the array.
-     *
-     * @return the diagonal
-     */
-    @Deprecated("Will be moved to F64TwoAxisArray in the future")
-    fun diagonal(): F64FlatArray = unsupported()
-
-    /**
-     * Returns the determination of this matrix.
-     *
-     * @return the determinant
-     * @since 1.1.1
-     */
-    @Deprecated("Will be moved to F64TwoAxisArray in the future")
-    fun determinant(): Double = unsupported()
-
-    /**
-     * Returns the inverse matrix.
-     * Note: for MxN matrices, it assumes a full-rank matrix.
-     *
-     * @return the inverse matrix
-     * @since 1.1.1
-     */
-    @Deprecated("Will be moved to F64TwoAxisArray in the future")
-    fun inverse(): F64TwoAxisArray = unsupported()
-
-    /**
-     * Computes the matrix multiplication of this array with another array.
-     */
-    @Deprecated("Will be moved to F64TwoAxisArray in the future")
-    infix fun matmul(other: F64Array): F64TwoAxisArray = unsupported()
-
-    /**
      * Returns the data from the array as a flat array.
      */
     fun toDoubleArray(): DoubleArray = unsupported()
@@ -1687,6 +1654,40 @@ interface F64Array {
             }
 
             val result = invoke(*shape)
+            var offset = 0
+            for (a in arrayOf(first, *rest)) {
+                if (a.length > 0) {
+                    a.copyTo(result.slice(offset, offset + a.shape[axis], axis = axis))
+                    offset += a.shape[axis]
+                }
+            }
+
+            return result
+        }
+
+        /**
+         * Concatenates the given arrays along the specified axis.
+         *
+         * @param first the first array
+         * @param rest the rest of the arrays
+         * @param axis the axis to concatenate along
+         * @return the concatenated array
+         * @since 1.3.0
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun concat(first: F64TwoAxisArray, vararg rest: F64TwoAxisArray, axis: Int = 0): F64TwoAxisArray {
+            for (other in rest) {
+                require(other.shape.remove(axis).contentEquals(first.shape.remove(axis))) {
+                    "input array shapes must be exactly equal for all dimensions except $axis"
+                }
+            }
+
+            val shape = first.shape.copyOf().apply {
+                this[axis] = first.shape[axis] + rest.sumOf { it.shape[axis] }
+            }
+
+            val result = invoke(shape[0], shape[1])
             var offset = 0
             for (a in arrayOf(first, *rest)) {
                 if (a.length > 0) {
