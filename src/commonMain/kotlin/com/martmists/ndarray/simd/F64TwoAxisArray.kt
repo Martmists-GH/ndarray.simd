@@ -1,7 +1,6 @@
 package com.martmists.ndarray.simd
 
 import com.martmists.ndarray.simd.impl.create
-import com.martmists.ndarray.simd.impl.unsupported
 
 /**
  * A 2D specialization type for [F64Array].
@@ -391,6 +390,23 @@ interface F64TwoAxisArray : F64Array {
     fun fftC2CInPlace()
 
     /**
+     * Performs an inverse Complex-to-Complex FFT on this array in-place.
+     * The second axis has to be [real, imag].
+     * The resulting array is not normalized.
+     *
+     * @since 1.3.1
+     */
+    fun ifftC2CInPlace() {
+        // Conjugate
+        V[_I, 1] = -V[_I, 1]
+
+        fftC2CInPlace()
+
+        // Conjugate again
+        V[_I, 1] = -V[_I, 1]
+    }
+
+    /**
      * Performs a Complex-to-Complex FFT on this array.
      * The second axis has to be [real, imag].
      * The resulting array is not normalized.
@@ -399,6 +415,16 @@ interface F64TwoAxisArray : F64Array {
      * @since 1.3.0
      */
     fun fftC2C() = copy().apply { fftC2CInPlace() }
+
+    /**
+     * Performs an inverse Complex-to-Complex FFT on this array.
+     * The second axis has to be [real, imag].
+     * The resulting array is not normalized.
+     *
+     * @return the IFFT result
+     * @since 1.3.1
+     */
+    fun ifftC2C() = copy().apply { ifftC2CInPlace() }
 
     companion object {
         /**
