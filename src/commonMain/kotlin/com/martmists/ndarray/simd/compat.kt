@@ -29,3 +29,19 @@ fun Double.pow(arr: F64Array): F64Array = arr.expBase(this)
  * Converts a [DoubleArray] to an [F64Array].
  */
 fun DoubleArray.toF64Array() = F64Array.of(this)
+
+/**
+ * Converts a [FloatArray] to an [F64Array].
+ * @since 1.4.0
+ */
+fun FloatArray.toF64Array() = F64Array(size) { this[it].toDouble() }
+
+/**
+ * Converts an [F64Array] to a [FloatArray].
+ * Only supported on flat arrays.
+ * @since 1.4.0
+ */
+fun F64Array.toFloatArray(): FloatArray {
+    val out = toDoubleArray()
+    return FloatArray(out.size) { out[it].toFloat() }
+}

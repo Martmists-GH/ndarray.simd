@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.3.1"
+version = "1.4.0"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -206,6 +206,36 @@ kotlin {
         commonTest {
             dependencies {
                 api(kotlin("test"))
+            }
+        }
+
+        jvmMain {
+            dependencies {
+                // Compat: OpenCV
+                compileOnly("org.openpnp:opencv:4.9.0-0")
+
+                // Compat: Exposed+PGVector
+                compileOnly("com.pgvector:pgvector:0.1.6")
+                compileOnly("org.jetbrains.exposed:exposed-core:0.52.0")
+
+                // Compat: Image Formats
+                compileOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                compileOnly("com.sksamuel.scrimage:scrimage-webp:4.1.3")
+
+                // Compat: Langchain4J
+                compileOnly("dev.langchain4j:langchain4j:0.32.0")
+
+                // Compat: kotlinx.dataframe
+                compileOnly("org.jetbrains.kotlinx:dataframe:0.13.1")
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                runtimeOnly("org.openpnp:opencv:4.9.0-0")
+                runtimeOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                runtimeOnly("dev.langchain4j:langchain4j:0.32.0")
+                runtimeOnly("org.jetbrains.kotlinx:dataframe:0.13.1")
             }
         }
     }
