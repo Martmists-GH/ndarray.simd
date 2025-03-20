@@ -2,6 +2,7 @@ package com.martmists.ndarray.simd
 
 import com.martmists.ndarray.simd.impl.create
 import com.martmists.ndarray.simd.impl.unsupported
+import kotlin.math.absoluteValue
 import kotlin.math.sqrt
 
 /**
@@ -417,6 +418,31 @@ interface F64FlatArray : F64Array {
      * @since 1.3.0
      */
     fun fftR2C(): F64TwoAxisArray = F64Array(shape[0], 2) { i, x -> if (x == 1) 0.0 else this[i] }.apply { fftC2CInPlace() }
+
+    /**
+     * Calculates the cosine distance between this vector and some [other] vector.
+     * @since 1.4.1
+     */
+    fun cosineDistance(other: F64FlatArray): Double {
+        return (dot(other) / (norm() * other.norm()))
+    }
+
+    /**
+     * Calculates the l1 (manhattan) distance between this vector and some [other] vector.
+     * @since 1.4.1
+     */
+    fun l1Distance(other: F64FlatArray): Double {
+        return (this - other).transform { it.absoluteValue }.sum()
+    }
+
+    /**
+     * Calculates the l2 (euclidean) distance between this vector and some [other] vector.
+     * @since 1.4.1
+     */
+    fun l2Distance(other: F64FlatArray): Double {
+        return sqrt((this - other).transform { it * it }.sum())
+    }
+
 
     companion object {
         /**

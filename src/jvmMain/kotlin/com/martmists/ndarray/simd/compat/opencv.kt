@@ -1,6 +1,7 @@
 package com.martmists.ndarray.simd.compat
 
 import com.martmists.ndarray.simd.F64Array
+import com.martmists.ndarray.simd.F64ImageArray
 import nu.pattern.OpenCV
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -38,7 +39,7 @@ private fun getScaleInfo(type: Int): Pair<Double, Double> {
  * @return The [F64Array] converted from the [Mat]. See [F64Array.fromImage][F64Array.Companion.fromImage] for the format.
  * @since 1.4.0
  */
-fun Mat.toF64Array(): F64Array {
+fun Mat.toF64Array(): F64ImageArray {
     usesOpenCV()
 
     val typ = if (type() == CvType.CV_64FC4) this else {
@@ -64,7 +65,7 @@ fun Mat.toF64Array(): F64Array {
                 }
             }
         }
-    }
+    }.image
 }
 
 /**
@@ -83,11 +84,8 @@ fun Mat.toF64Array(): F64Array {
  * @return The OpenCV Mat containing the given data.
  * @since 1.4.0
  */
-fun F64Array.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
+fun F64ImageArray.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
     usesOpenCV()
-
-    require(shape.size == 3) { "Expected 3D array, got ${shape.size}D" }
-    require(shape[2] in arrayOf(1, 3, 4)) { "Array must be greyscale, rgb or rgba, got ${shape[2]} channels." }
 
     val w = shape[0]
     val h = shape[1]
@@ -110,8 +108,7 @@ fun F64Array.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
                     (0 until resChannels).map {
                         when {
                             it < ch -> this@toOpenCVMat[x, y, it]
-                            it == 3 -> 1.0  // Alpha missing in input
-                            else -> this@toOpenCVMat[x, y, 0]  // Monochrome
+                            else -> 1.0  // Alpha missing in input
                         }
                     }.toDoubleArray()
                 }
@@ -124,4 +121,25 @@ fun F64Array.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
     val (a, b) = getScaleInfo(type)
     tmp.convertTo(out, type, a, -b)
     return out
+}
+
+/**
+ * Converts an [F64Array] to a [Mat].
+ *
+ * The required shape must have either 1, 3 or 4 channels in the 3rd dimension:
+ * If 1 channel, shape must be [width, height, 1]
+ * If 3 channels, shape must be [width, height, rgb]
+ * If 4 channels, shape must be [width, height, rgba]
+ *
+ * All values in this array are expected to be in range `[0..1]`.
+ * If values are outside this range, unexpected behavior may occur.
+ *
+ * @receiver The image array.
+ * @param type A type from [CvType], representing the data type and channels.
+ * @return The OpenCV Mat containing the given data.
+ * @since 1.4.0
+ */
+@Deprecated("Use array.image instead", replaceWith = ReplaceWith("image.toOpenCVMat(type)"))
+fun F64Array.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
+    return image.toOpenCVMat(type)
 }
