@@ -3,6 +3,7 @@
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.*
+import com.martmists.ndarray.simd.compat.image
 
 internal class F64ImageArrayImpl internal constructor(private val backing: F64Array) : F64Array by backing, F64ImageArray {
     override val channels = shape[2]
@@ -74,5 +75,24 @@ internal class F64ImageArrayImpl internal constructor(private val backing: F64Ar
                 }
             }
         }
+    }
+
+    override fun convolve(kernel: F64TwoAxisArray): F64ImageArray {
+        val kernelSize = kernel.shape[0]
+        val kernelCenter = kernelSize / 2
+
+        return F64Array(shape[0], shape[1], shape[2]) { x, y, z ->
+            var sum = 0.0
+            for (i in 0 until kernelSize) {
+                for (j in 0 until kernelSize) {
+                    val xIndex = x + i - kernelCenter
+                    val yIndex = y + j - kernelCenter
+                    if (xIndex in 0 until shape[0] && yIndex in 0 until shape[1]) {
+                        sum += this[xIndex, yIndex, z] * kernel[i, j]
+                    }
+                }
+            }
+            sum
+        }.image
     }
 }
