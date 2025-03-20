@@ -1,6 +1,5 @@
 package com.martmists.ndarray.simd.compat
 
-import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
 import com.martmists.ndarray.simd.toF64Array
 import com.martmists.ndarray.simd.toFloatArray

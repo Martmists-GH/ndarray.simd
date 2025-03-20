@@ -1,8 +1,11 @@
+@file:JvmName("ImageCommonKt")
+
 package com.martmists.ndarray.simd.compat
 
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64ImageArray
 import com.martmists.ndarray.simd.impl.F64ImageArrayImpl
+import kotlin.jvm.JvmName
 
 /**
  * A wrapper for image operations.

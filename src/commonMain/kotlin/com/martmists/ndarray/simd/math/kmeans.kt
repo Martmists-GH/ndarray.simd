@@ -3,6 +3,7 @@ package com.martmists.ndarray.simd.math
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64Array.Companion.zeros
 import com.martmists.ndarray.simd.F64FlatArray
+import kotlin.jvm.JvmName
 
 typealias Cluster = List<F64FlatArray>
 
@@ -75,6 +76,7 @@ fun clusterKMeans(k: Int, points: Array<F64FlatArray>): Map<F64FlatArray, Cluste
  * @return A map of size `k` from centroid to cluster
  * @since 1.4.1
  */
+@JvmName("clusterKMeansND")
 fun clusterKMeans(k: Int, points: List<F64Array>): Map<F64FlatArray, Cluster> {
     return clusterKMeans(k, points.map(F64Array::flatten))
 }
