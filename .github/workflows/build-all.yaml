@@ -17,12 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'adopt'
@@ -35,7 +35,7 @@ jobs:
           key: ${{ runner.os }}-konan
 
       - name: Gradle Build
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: -Pproduction=true build
 
@@ -49,6 +49,6 @@ jobs:
             **/build/test-results/
 
       - name: Gradle Publish
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: -Pproduction=true -PmavenCentralUsername=${{ secrets.MAVEN_CENTRAL_USER }} -PmavenCentralPassword=${{ secrets.MAVEN_CENTRAL_TOKEN }} publish
