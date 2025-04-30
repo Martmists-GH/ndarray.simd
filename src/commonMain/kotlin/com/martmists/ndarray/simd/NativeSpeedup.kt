@@ -1,6 +1,10 @@
 package com.martmists.ndarray.simd
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal expect object NativeSpeedup {
+    fun getSimdSize(): Int
+    fun getSimdAvailable(): Boolean
+
     fun vecAddVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     fun vecAddScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)
     fun vecSubVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
@@ -55,7 +59,6 @@ internal expect object NativeSpeedup {
     fun vecLog10(a: DoubleArray, aOffset: Int, aSize: Int)
 
     fun vecCopy(dest: DoubleArray, destOffset: Int, destSize: Int, src: DoubleArray, srcOffset: Int)
-    fun getSimdSize(): Int
 
     fun vecSum(a: DoubleArray, aOffset: Int, aSize: Int): Double
     fun vecMin(a: DoubleArray, aOffset: Int, aSize: Int): Double

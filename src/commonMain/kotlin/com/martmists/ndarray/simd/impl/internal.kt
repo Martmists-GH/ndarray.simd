@@ -5,6 +5,7 @@ package com.martmists.ndarray.simd.impl
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
 import com.martmists.ndarray.simd.F64TwoAxisArray
+import com.martmists.ndarray.simd.NativeSpeedup
 import kotlin.math.min
 
 internal fun F64Array.view0(indices: IntArray): F64Array {
@@ -135,7 +136,7 @@ internal fun F64FlatArray.Companion.create(
 ): F64FlatArray {
     require(size > 0) { "empty arrays not supported" }
     return if (stride == 1) {
-        if (size < F64Array.simdSize) {
+        if (size < F64Array.simdSize || !NativeSpeedup.getSimdAvailable()) {
             F64SmallDenseFlatArrayImpl(data, offset, size)
         } else {
             F64LargeDenseFlatArrayImpl(data, offset, size)

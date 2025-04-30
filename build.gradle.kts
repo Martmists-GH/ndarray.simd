@@ -3,22 +3,38 @@
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.configurationcache.extensions.capitalized
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.konan.target.KonanTarget
+import java.util.Properties
 
 plugins {
     kotlin("multiplatform")
     `maven-publish`
+    id("com.android.library")
     id("org.jetbrains.dokka")
     id("com.vanniktech.maven.publish")
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.4.4"
+version = "1.5.0"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
+    google()
     mavenCentral()
+}
+
+android {
+    compileSdk = 35
+    namespace = group.toString().replace('-', '.')
+    ndkVersion = "21.4.7075529"
+
+    sourceSets {
+        getByName("debug").jniLibs.srcDirs(project.layout.buildDirectory.dir("generated/jni/Debug"))
+        getByName("release").jniLibs.srcDirs(project.layout.buildDirectory.dir("generated/jni/Release"))
+    }
 }
 
 kotlin {
@@ -26,7 +42,10 @@ kotlin {
 
     withSourcesJar()
 
-    jvm()
+    androidTarget {
+        publishLibraryVariants("release", "debug")
+    }
+    jvm("desktop")
 
     val natives = if (isProduction) {
         listOf(
@@ -39,6 +58,9 @@ kotlin {
             // Feel free to open a PR
 //            macosX64(),
 //            macosArm64(),
+
+            androidNativeArm64(),
+            androidNativeX64(),
         )
     } else {
         when (val osArch = System.getProperty("os.arch")) {
@@ -58,26 +80,42 @@ kotlin {
         }
     }
 
+    applyDefaultHierarchyTemplate()
+
     for (native in natives) {
         native.apply {
             binaries {
                 sharedLib {
                     baseName = "ndarray_simd"
+
+                    if (native.targetName.startsWith("android")) {
+                        linkTaskProvider.configure {
+                            doLast {
+                                copy {
+                                    from(outputFile)
+
+                                    val typeName = if (buildType == NativeBuildType.DEBUG) "Debug" else "Release"
+                                    val abiDirName = when (this@sharedLib.target.konanTarget) {
+                                        KonanTarget.ANDROID_ARM32 -> "armeabi-v7a"
+                                        KonanTarget.ANDROID_ARM64 -> "arm64-v8a"
+                                        KonanTarget.ANDROID_X86 -> "x86"
+                                        KonanTarget.ANDROID_X64 -> "x86_64"
+                                        else -> "unknown"
+                                    }
+
+                                    into(project.layout.buildDirectory.dir("generated/jni/$typeName/$abiDirName"))
+                                }
+                            }
+                        }
+
+                        afterEvaluate {
+                            tasks.getByName("preBuild").dependsOn(linkTaskProvider)
+                        }
+                    }
                 }
             }
 
             compilations.named("main") {
-                val jni by cinterops.creating {
-                    val javaHome = File(System.getProperty("java.home")!!)
-                    defFile(projectDir.resolve("src/nativeMain/cinterops/jni.def"))
-                    includeDirs(
-                        javaHome.resolve("include"),
-                        javaHome.resolve("include/linux"),
-                        javaHome.resolve("include/darwin"),
-                        javaHome.resolve("include/win32"),
-                    )
-                }
-
                 val simd by cinterops.creating {
                     defFile(projectDir.resolve("src/nativeMain/cinterops/simd.def"))
                     includeDirs(
@@ -198,25 +236,43 @@ kotlin {
                         dependsOn(arTask)
                     }
                 }
+
+                if (!native.targetName.startsWith("android")) {
+                    val jni by cinterops.creating {
+                        val javaHome = File(System.getProperty("java.home")!!)
+                        defFile(projectDir.resolve("src/desktopNativeMain/cinterops/jni.def"))
+
+                        includeDirs(
+                            javaHome.resolve("include"),
+                            javaHome.resolve("include/linux"),
+                            javaHome.resolve("include/darwin"),
+                            javaHome.resolve("include/win32"),
+                        )
+                    }
+                }
             }
         }
     }
 
     sourceSets {
-        commonTest {
+        val commonMain by getting
+
+        val commonTest by getting {
             dependencies {
                 api(kotlin("test"))
             }
         }
 
-        jvmMain {
+        val jvmMain by creating {
+            dependsOn(commonMain)
+
             dependencies {
                 // Compat: OpenCV
                 compileOnly("org.openpnp:opencv:4.9.0-0")
 
                 // Compat: Exposed+PGVector
                 compileOnly("com.pgvector:pgvector:0.1.6")
-                compileOnly("org.jetbrains.exposed:exposed-core:0.52.0")
+                compileOnly("org.jetbrains.exposed:exposed-core:0.60.0")
 
                 // Compat: Image Formats
                 compileOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
@@ -226,17 +282,49 @@ kotlin {
                 compileOnly("dev.langchain4j:langchain4j:0.32.0")
 
                 // Compat: kotlinx.dataframe
-                compileOnly("org.jetbrains.kotlinx:dataframe:0.13.1")
+                compileOnly("org.jetbrains.kotlinx:dataframe-core:0.13.1")
             }
         }
 
-        jvmTest {
+        val jvmTest by creating {
+            dependsOn(commonTest)
+
             dependencies {
-                runtimeOnly("org.openpnp:opencv:4.9.0-0")
-                runtimeOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
-                runtimeOnly("dev.langchain4j:langchain4j:0.32.0")
-                runtimeOnly("org.jetbrains.kotlinx:dataframe:0.13.1")
+                implementation("org.openpnp:opencv:4.9.0-0")
+                implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                implementation("dev.langchain4j:langchain4j:0.32.0")
+                implementation("org.jetbrains.kotlinx:dataframe-core:0.13.1")
             }
+        }
+
+        val androidMain by getting {
+            dependsOn(jvmMain)
+        }
+
+        val desktopMain by getting {
+            dependsOn(jvmMain)
+        }
+
+        val nativeMain by getting
+
+        val desktopNativeMain by creating {
+            dependsOn(nativeMain)
+        }
+
+        for (native in natives) {
+            if (!native.targetName.startsWith("android")) {
+                named("${native.targetName}Main") {
+                    dependsOn(desktopNativeMain)
+                }
+            }
+        }
+
+//        val androidUnitTest by getting {
+//            dependsOn(jvmTest)
+//        }
+
+        val desktopTest by getting {
+            dependsOn(jvmTest)
         }
     }
 }
@@ -255,14 +343,23 @@ tasks {
         }
     }
 
-    val jvmProcessResources by existing(Copy::class) {
+    afterEvaluate {
+        named("testDebugUnitTest") {
+            enabled = false
+        }
+        named("testReleaseUnitTest") {
+            enabled = false
+        }
+    }
+
+    val desktopProcessResources by existing(Copy::class) {
         val binaryName = if (isProduction) {
             "releaseShared"
         } else {
             "debugShared"
         }
 
-        for (native in kotlin.targets.withType<KotlinNativeTarget>()) {
+        for (native in kotlin.targets.withType<KotlinNativeTarget>().filter { !it.name.startsWith("android") }) {
             into("META-INF/natives/${native.targetName}") {
                 from(named(native.binaries.getByName(binaryName).linkTaskName)) {
                     exclude("**/*.h")
@@ -340,7 +437,7 @@ if (isProduction) {
 
     mavenPublishing {
         publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
-        coordinates(group as String, name, releaseVersion)
+        coordinates(group.toString(), name, releaseVersion)
         signAllPublications()
 
         pom {

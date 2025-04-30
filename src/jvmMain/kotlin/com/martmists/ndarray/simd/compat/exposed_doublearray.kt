@@ -1,6 +1,5 @@
 package com.martmists.ndarray.simd.compat
 
-import com.google.common.io.ByteStreams
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64FlatArray
 import com.martmists.ndarray.simd.impl.create
@@ -68,7 +67,7 @@ internal class F64ArrayColumnType : ColumnType<F64Array>() {
         }
 
         @JvmStatic
-        fun parse(data: InputStream) = parse(ByteStreams.toByteArray(data))
+        fun parse(data: InputStream) = parse(data.readAllBytes())
     }
 }
 
@@ -80,4 +79,3 @@ internal class F64ArrayColumnType : ColumnType<F64Array>() {
  * @since 1.4.3
  */
 fun Table.ndarray(name: String): Column<F64Array> = registerColumn(name, F64ArrayColumnType())
-

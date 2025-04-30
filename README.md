@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.martmists.ndarray-simd:ndarray-simd:1.4.4")
+    implementation("com.martmists.ndarray-simd:ndarray-simd:1.5.0")
 }
 ```
 

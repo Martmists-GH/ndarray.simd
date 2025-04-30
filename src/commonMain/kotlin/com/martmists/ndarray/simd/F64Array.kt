@@ -1393,7 +1393,13 @@ interface F64Array {
          * The minimum size of a flat array to use SIMD operations.
          * Depends on the System, but usually 8 or 16.
          */
-        val simdSize by lazy { NativeSpeedup.getSimdSize() * 2 }
+        val simdSize by lazy {
+            if (NativeSpeedup.getSimdAvailable()) {
+                NativeSpeedup.getSimdSize() * 2
+            } else {
+                8  // Fallback for Android Unit Test
+            }
+        }
 
         /**
          * The relative and absolute tolerance for eq/neq.

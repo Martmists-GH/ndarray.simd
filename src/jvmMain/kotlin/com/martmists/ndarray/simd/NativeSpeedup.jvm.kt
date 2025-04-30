@@ -2,29 +2,44 @@ package com.martmists.ndarray.simd
 
 import java.io.File
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal actual object NativeSpeedup {
+    private var initSuccess = false
+
     init {
-        val osName = System.getProperty("os.name")
-        val (platform, filename) = when {
-            osName.startsWith("Linux") -> "linux" to "libndarray_simd.so"
-            osName.startsWith("Mac") -> "macos" to "libndarray_simd.dylib"
-            osName.startsWith("Windows") -> "windows" to "ndarray_simd.dll"
-            else -> throw UnsupportedOperationException("Unsupported platform: $osName")
+        try {
+            if (System.getProperty("java.vm.vendor") == "The Android Project") {
+                System.loadLibrary("ndarray_simd")
+                initSuccess = true
+            } else {
+                val osName = System.getProperty("os.name") ?: error("no os.name value")
+                val (platform, filename) = when {
+                    osName.startsWith("Linux") -> "linux" to "libndarray_simd.so"
+                    osName.startsWith("Mac") -> "macos" to "libndarray_simd.dylib"
+                    osName.startsWith("Windows") -> "windows" to "ndarray_simd.dll"
+                    else -> throw UnsupportedOperationException("Unsupported platform: $osName")
+                }
+                val arch = when (val osArch = System.getProperty("os.arch") ?: error("no os.arch value")) {
+                    "x86_64", "amd64" -> "X64"
+                    "aarch64" -> "Arm64"
+                    else -> throw UnsupportedOperationException("Unsupported architecture: $osArch")
+                }
+
+                val lib = NativeSpeedup::class.java.getResourceAsStream("/META-INF/natives/$platform$arch/$filename") ?: error("Unable to load native lib from resources")
+                val tmp = File.createTempFile("ndarray_simd", ".${filename.substringAfterLast('.')}")
+                tmp.deleteOnExit()
+                lib.copyTo(tmp.outputStream())
+
+                System.load(tmp.absolutePath)
+
+                initSuccess = true
+            }
+        } catch (e: Exception) {
+            println("Error occurred setting up JNI: ${e.stackTraceToString()}")
         }
-        val arch = when (val osArch = System.getProperty("os.arch")) {
-            "x86_64", "amd64" -> "X64"
-            "aarch64" -> "Arm64"
-            else -> throw UnsupportedOperationException("Unsupported architecture: $osArch")
-        }
-
-        val tmp = File.createTempFile("ndarray_simd", ".${filename.substringAfterLast('.')}")
-        tmp.deleteOnExit()
-
-        val lib = NativeSpeedup::class.java.getResourceAsStream("/META-INF/natives/$platform$arch/$filename")!!
-        lib.copyTo(tmp.outputStream())
-
-        System.load(tmp.absolutePath)
     }
+
+    actual fun getSimdAvailable() = initSuccess
 
     actual external fun vecAddVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int)
     actual external fun vecAddScalar(a: DoubleArray, aOffset: Int, aSize: Int, b: Double)

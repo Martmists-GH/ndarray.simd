@@ -3,7 +3,10 @@ package com.martmists.ndarray.simd
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 internal actual object NativeSpeedup {
+    actual fun getSimdAvailable() = true
+
     actual fun vecAddVec(a: DoubleArray, aOffset: Int, aSize: Int, b: DoubleArray, bOffset: Int) {
         a.usePinned { pinA ->
             b.usePinned { pinB ->

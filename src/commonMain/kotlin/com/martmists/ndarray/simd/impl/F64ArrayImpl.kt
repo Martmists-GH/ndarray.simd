@@ -3,7 +3,6 @@
 package com.martmists.ndarray.simd.impl
 
 import com.martmists.ndarray.simd.*
-import kotlin.math.abs
 
 internal open class F64ArrayImpl internal constructor(
     @get:Deprecated("This should not be accessed directly")

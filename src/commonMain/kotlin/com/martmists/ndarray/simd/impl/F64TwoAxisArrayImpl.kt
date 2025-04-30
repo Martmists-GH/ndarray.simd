@@ -56,7 +56,7 @@ internal open class F64TwoAxisArrayImpl internal constructor(
             "matmul dimensions do not match: ${shape[1]} != ${other.shape[0]}"
         }
 
-        return if (other is F64TwoAxisArrayImpl && shape[1] >= F64Array.simdSize) {
+        return if (other is F64TwoAxisArrayImpl && shape[1] >= F64Array.simdSize && NativeSpeedup.getSimdAvailable()) {
             val cur = makeDenseForMatmul()
             val t = other.transpose().makeDenseForMatmul()
 
