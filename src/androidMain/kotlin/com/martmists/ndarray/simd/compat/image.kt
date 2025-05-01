@@ -52,3 +52,27 @@ fun F64Array.Companion.fromImage(img: Bitmap): F64ImageArray {
 
     return arr
 }
+
+/**
+ * Creates a [Bitmap] from the [F64Array]
+ *
+ * @receiver the image array. See [F64Array.fromImage][F64Array.Companion.fromImage] for the format.
+ * @return the [Bitmap] created from the array.
+ * @since 1.5.3
+ */
+fun F64ImageArray.toBitmap(): Bitmap {
+    val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val hasAlpha = channels == 4
+
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            var pxInt = if (hasAlpha) ((this[x, y, 3] * 255).toInt().coerceIn(0, 255) shl 24) else 0xFF000000.toInt()
+            pxInt = pxInt or ((this[x, y, 0] * 255).toInt().coerceIn(0, 255) shl 16)
+            pxInt = pxInt or ((this[x, y, 1] * 255).toInt().coerceIn(0, 255) shl 8)
+            pxInt = pxInt or ((this[x, y, 2] * 255).toInt().coerceIn(0, 255))
+            bmp.setPixel(x, y, pxInt)
+        }
+    }
+
+    return bmp
+}
