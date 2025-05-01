@@ -95,4 +95,6 @@ internal class F64ImageArrayImpl internal constructor(private val backing: F64Ar
             sum
         }.image
     }
+
+    override fun toString() = toString(8)
 }
