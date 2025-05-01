@@ -57,7 +57,3 @@ fun F64Array.Companion.fromImage(img: BufferedImage): F64ImageArray {
 
     return arr
 }
-
-fun F64ImageArray.toBufferedImage(): BufferedImage {
-    if ()
-}
