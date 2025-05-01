@@ -17,7 +17,7 @@ import java.io.File
 private fun Int.asColorDouble(): Double = (if (this < 0) 256 + this else this) / 255.0
 
 /**
- * Reads a BufferedImage into an [F64Array].
+ * Reads a Bitmap into an [F64Array].
  *
  * The resulting [F64Array] will have shape `[width, height, 4]`,
  *  where the 3rd dimension is in order RGBA. All values are in range `[0..1]`
