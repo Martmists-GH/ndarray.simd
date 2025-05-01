@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.5.1"
+version = "1.5.2"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -293,6 +293,10 @@ kotlin {
                 implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
                 implementation("dev.langchain4j:langchain4j:0.32.0")
                 implementation("org.jetbrains.kotlinx:dataframe-core:0.13.1")
+
+                implementation("org.jetbrains.exposed:exposed-core:0.60.0")
+                implementation("org.jetbrains.exposed:exposed-jdbc:0.60.0")
+                implementation("org.xerial:sqlite-jdbc:3.44.1.0")
             }
         }
 

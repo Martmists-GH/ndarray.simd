@@ -6,7 +6,10 @@ import com.martmists.ndarray.simd.impl.create
 import com.martmists.ndarray.simd.impl.product
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ColumnType
+import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.statements.api.PreparedStatementApi
 import org.jetbrains.exposed.sql.vendors.SQLServerDialect
 import org.jetbrains.exposed.sql.vendors.currentDialect
 import java.io.InputStream
@@ -29,12 +32,18 @@ internal class F64ArrayColumnType : ColumnType<F64Array>() {
         else -> error("Unexpected value of type F64Array: $value of ${value::class.qualifiedName}")
     }
 
-    override fun nonNullValueToString(value: F64Array) = currentDialect.dataTypeProvider.hexToDb(store(value).toHexString())
-    private fun ByteArray.toHexString(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+    override fun notNullValueToDB(value: F64Array) = ExposedBlob(store(value))
 
     override fun readObject(rs: ResultSet, index: Int) = when {
         currentDialect is SQLServerDialect -> rs.getBytes(index)?.let(F64ArrayColumnType::parse)
         else -> rs.getBinaryStream(index)?.let(F64ArrayColumnType::parse)
+    }
+
+    override fun setParameter(stmt: PreparedStatementApi, index: Int, value: Any?) {
+        when (val toSetValue = (value as? ExposedBlob)?.inputStream ?: value) {
+            is InputStream -> stmt.setInputStream(index, toSetValue, false)
+            else -> super.setParameter(stmt, index, toSetValue)
+        }
     }
 
     companion object {
@@ -78,5 +87,4 @@ internal class F64ArrayColumnType : ColumnType<F64Array>() {
  * @param size The size of the vector.
  * @since 1.4.3
  */
-@Deprecated("Currently not working as expected!")
 fun Table.ndarray(name: String): Column<F64Array> = registerColumn(name, F64ArrayColumnType())
