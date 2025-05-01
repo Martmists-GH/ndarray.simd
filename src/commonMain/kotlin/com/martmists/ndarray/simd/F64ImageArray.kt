@@ -7,6 +7,8 @@ import com.martmists.ndarray.simd.compat.image
  * @since 1.4.1
  */
 interface F64ImageArray : F64Array {
+    val width: Int
+    val height: Int
     val channels: Int
 
     /**

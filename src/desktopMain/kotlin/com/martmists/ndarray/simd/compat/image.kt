@@ -3,15 +3,11 @@
 package com.martmists.ndarray.simd.compat
 
 import com.martmists.ndarray.simd.F64Array
-import com.martmists.ndarray.simd.F64Array.Companion.invoke
 import com.martmists.ndarray.simd.F64ImageArray
-import com.sksamuel.scrimage.ImmutableImage
-import com.sksamuel.scrimage.nio.JpegWriter
-import com.sksamuel.scrimage.nio.PngWriter
-import com.sksamuel.scrimage.webp.WebpWriter
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
-import java.io.File
+import java.awt.image.DataBufferInt
+
 
 private fun Int.asColorDouble(): Double = (if (this < 0) 256 + this else this) / 255.0
 
@@ -56,4 +52,29 @@ fun F64Array.Companion.fromImage(img: BufferedImage): F64ImageArray {
     }
 
     return arr
+}
+
+/**
+ * Creates a [BufferedImage] from the [F64Array]
+ *
+ * @receiver the image array. See [F64Array.fromImage][F64Array.Companion.fromImage] for the format.
+ * @return the [BufferedImage] created from the array.
+ * @since 1.5.3
+ */
+fun F64ImageArray.toBufferedImage(): BufferedImage {
+    val hasAlpha = channels == 4
+    val img = BufferedImage(width, height, if (hasAlpha) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB)
+    val pxData = (img.raster.dataBuffer as DataBufferInt).data
+    val pxSize = if (hasAlpha) 4 else 3
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val idx = (x + y * width) * pxSize
+            var pxInt = if (hasAlpha) ((this[x, y, 3] * 255).toInt().coerceIn(0, 255) shl 24) else 0
+            pxInt = pxInt or ((this[x, y, 0] * 255).toInt().coerceIn(0, 255) shl 16)
+            pxInt = pxInt or ((this[x, y, 1] * 255).toInt().coerceIn(0, 255) shl 8)
+            pxInt = pxInt or ((this[x, y, 2] * 255).toInt().coerceIn(0, 255))
+            pxData[idx] = pxInt
+        }
+    }
+    return img
 }

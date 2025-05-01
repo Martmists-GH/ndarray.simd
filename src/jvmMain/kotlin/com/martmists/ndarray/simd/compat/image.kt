@@ -33,9 +33,9 @@ fun F64Array.Companion.fromImage(file: File): F64ImageArray {
     for (y in 0 until h) {
         for (x in 0 until w) {
             val px = img.pixel(x, y)
-            arr[x, y, 0] = px.red().toDouble() / 255.0
-            arr[x, y, 1] = px.green().toDouble() / 255.0
-            arr[x, y, 2] = px.blue().toDouble() / 255.0
+            arr[x, y, 0] = px.red().asColorDouble()
+            arr[x, y, 1] = px.green().asColorDouble()
+            arr[x, y, 2] = px.blue().asColorDouble()
             arr[x, y, 3] = px.alpha().asColorDouble()
         }
     }
@@ -50,11 +50,9 @@ fun F64Array.Companion.fromImage(file: File): F64ImageArray {
  * @since 1.4.1
  */
 fun F64ImageArray.toImage(file: File) {
-    val w = shape[0]
-    val h = shape[1]
-    val img = ImmutableImage.create(w, h)
-    for (y in 0 until h) {
-        for (x in 0 until w) {
+    val img = ImmutableImage.create(width, height)
+    for (y in 0 until height) {
+        for (x in 0 until width) {
             var px = img.pixel(x, y)
             px = px.red((this[x, y, 0] * 255).toInt())
             px = px.green((this[x, y, 1] * 255).toInt())

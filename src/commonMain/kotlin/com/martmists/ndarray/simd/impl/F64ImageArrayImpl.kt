@@ -6,6 +6,8 @@ import com.martmists.ndarray.simd.*
 import com.martmists.ndarray.simd.compat.image
 
 internal class F64ImageArrayImpl internal constructor(private val backing: F64Array) : F64Array by backing, F64ImageArray {
+    override val width = shape[0]
+    override val height = shape[1]
     override val channels = shape[2]
 
     override fun copy(): F64ImageArray {
