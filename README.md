@@ -6,6 +6,8 @@ A Kotlin NDArray library with built-in SIMD support.
 
 ```kotlin
 repositories {
+    mavenCentral()
+    // OR, more reliably (because mavenCentral likes to not validate files sometimes):
     maven("https://maven.martmists.com/releases")
 }
 
