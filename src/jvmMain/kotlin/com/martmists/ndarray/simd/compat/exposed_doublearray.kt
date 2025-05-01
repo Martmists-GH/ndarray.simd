@@ -72,10 +72,11 @@ internal class F64ArrayColumnType : ColumnType<F64Array>() {
 }
 
 /**
- * A column type for storing vectors in PostgreSQL.
+ * A column type for storing vectors in Exposed.
  *
  * @param name The name of the column.
  * @param size The size of the vector.
  * @since 1.4.3
  */
+@Deprecated("Currently not working as expected!")
 fun Table.ndarray(name: String): Column<F64Array> = registerColumn(name, F64ArrayColumnType())
