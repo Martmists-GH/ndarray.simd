@@ -48,6 +48,8 @@ fun Mat.toF64Array(scale: Boolean = true): F64ImageArray {
             if (scale) {
                 val (ai, bi) = getScaleInfo(type())
                 convertTo(it, it.type(), 1 / ai, bi)
+            } else {
+                convertTo(it, it.type())
             }
         }
     }
