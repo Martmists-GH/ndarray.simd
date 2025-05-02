@@ -32,6 +32,7 @@ fun F64Array.Companion.fromImage(img: Bitmap): F64ImageArray {
     val hasAlpha = img.hasAlpha()
     val arr = F64Array(w, h, 4).image
 
+    // FIXME: Use IntArray for access instead for speed
     for (y in 0 until h) {
         for (x in 0 until w) {
             val px = img.getPixel(x, y)
@@ -64,6 +65,7 @@ fun F64ImageArray.toBitmap(): Bitmap {
     val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val hasAlpha = channels == 4
 
+    // FIXME: Use IntArray for access instead for speed
     for (y in 0 until height) {
         for (x in 0 until width) {
             var pxInt = if (hasAlpha) ((this[x, y, 3] * 255).toInt().coerceIn(0, 255) shl 24) else 0xFF000000.toInt()

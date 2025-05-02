@@ -36,16 +36,19 @@ private fun getScaleInfo(type: Int): Pair<Double, Double> {
  *
  * The resulting F64Array will always contain 4 channels.
  *
+ * @param scale Whether to scale the values (useful for images, not for other Mats)
  * @return The [F64Array] converted from the [Mat]. See [F64Array.fromImage][F64Array.Companion.fromImage] for the format.
  * @since 1.4.0
  */
-fun Mat.toF64Array(): F64ImageArray {
+fun Mat.toF64Array(scale: Boolean = true): F64ImageArray {
     usesOpenCV()
 
     val typ = if (type() == CvType.CV_64FC4) this else {
         Mat(size(), CvType.CV_64FC4).also {
-            val (ai, bi) = getScaleInfo(type())
-            convertTo(it, it.type(), 1 / ai, bi)
+            if (scale) {
+                val (ai, bi) = getScaleInfo(type())
+                convertTo(it, it.type(), 1 / ai, bi)
+            }
         }
     }
 
@@ -69,7 +72,7 @@ fun Mat.toF64Array(): F64ImageArray {
 }
 
 /**
- * Converts an [F64Array] to a [Mat].
+ * Converts an [F64ImageArray] to a [Mat].
  *
  * The required shape must have either 1, 3 or 4 channels in the 3rd dimension:
  * If 1 channel, shape must be [width, height, 1]
@@ -84,7 +87,7 @@ fun Mat.toF64Array(): F64ImageArray {
  * @return The OpenCV Mat containing the given data.
  * @since 1.4.0
  */
-fun F64ImageArray.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
+fun F64ImageArray.toOpenCVMat(type: Int = CvType.CV_64FC4, scale: Boolean = true): Mat {
     usesOpenCV()
 
     val w = shape[0]
@@ -118,8 +121,12 @@ fun F64ImageArray.toOpenCVMat(type: Int = CvType.CV_64FC4): Mat {
     }
 
     val out = Mat(w, h, type)
-    val (a, b) = getScaleInfo(type)
-    tmp.convertTo(out, type, a, -b)
+    if (scale) {
+        val (a, b) = getScaleInfo(type)
+        tmp.convertTo(out, type, a, -b)
+    } else {
+        tmp.convertTo(out, type)
+    }
     return out
 }
 
