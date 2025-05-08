@@ -273,10 +273,6 @@ kotlin {
                 compileOnly("com.pgvector:pgvector:0.1.6")
                 compileOnly("org.jetbrains.exposed:exposed-core:0.60.0")
 
-                // Compat: Image Formats
-                compileOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
-                compileOnly("com.sksamuel.scrimage:scrimage-webp:4.1.3")
-
                 // Compat: Langchain4J
                 compileOnly("dev.langchain4j:langchain4j:0.32.0")
 
@@ -293,7 +289,6 @@ kotlin {
 
             dependencies {
                 implementation("org.openpnp:opencv:4.9.0-0")
-                implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
                 implementation("dev.langchain4j:langchain4j:0.32.0")
                 implementation("org.jetbrains.kotlinx:dataframe-core:0.13.1")
                 implementation("ai.djl:api:0.32.0")
@@ -301,7 +296,6 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-core:0.60.0")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.60.0")
                 implementation("org.xerial:sqlite-jdbc:3.44.1.0")
-
             }
         }
 
@@ -311,6 +305,12 @@ kotlin {
 
         val desktopMain by getting {
             dependsOn(jvmMain)
+
+            dependencies {
+                // Compat: Image Formats
+                compileOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                compileOnly("com.sksamuel.scrimage:scrimage-webp:4.1.3")
+            }
         }
 
         val nativeMain by getting
