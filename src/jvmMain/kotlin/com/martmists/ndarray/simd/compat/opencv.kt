@@ -11,7 +11,7 @@ import org.opencv.core.Mat
  * Currently only calls a single function.
  */
 private fun usesOpenCV() {
-    OpenCV.loadLocally()
+    OpenCV.loadShared()
 }
 
 /**
