@@ -300,6 +300,9 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-core:0.60.0")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.60.0")
                 implementation("org.xerial:sqlite-jdbc:3.44.1.0")
+
+                implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                implementation("com.sksamuel.scrimage:scrimage-webp:4.1.3")
             }
         }
 
