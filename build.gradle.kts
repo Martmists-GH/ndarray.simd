@@ -30,6 +30,10 @@ android {
     namespace = group.toString().replace('-', '.')
     ndkVersion = "21.4.7075529"
 
+    defaultConfig {
+        minSdk = 28
+    }
+
     sourceSets {
         getByName("debug").jniLibs.srcDirs(project.layout.buildDirectory.dir("generated/jni/Debug"))
         getByName("release").jniLibs.srcDirs(project.layout.buildDirectory.dir("generated/jni/Release"))

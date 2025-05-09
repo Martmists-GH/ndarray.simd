@@ -5,15 +5,9 @@ package com.martmists.ndarray.simd.compat
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import com.martmists.ndarray.simd.F64Array
-import com.martmists.ndarray.simd.F64Array.Companion.invoke
 import com.martmists.ndarray.simd.F64ImageArray
-import com.sksamuel.scrimage.ImmutableImage
-import com.sksamuel.scrimage.nio.JpegWriter
-import com.sksamuel.scrimage.nio.PngWriter
-import com.sksamuel.scrimage.webp.WebpWriter
-import java.awt.image.BufferedImage
-import java.awt.image.DataBufferByte
 import java.io.File
+import java.nio.ByteBuffer
 
 private fun Int.asColorDouble(): Double = (if (this < 0) 256 + this else this) / 255.0
 
@@ -105,5 +99,5 @@ actual fun F64Array.Companion.fromImage(file: File): F64ImageArray {
  * @since 1.7.0
  */
 actual fun F64Array.Companion.fromImage(file: ByteArray): F64ImageArray {
-    return fromImage(ImageDecoder.decodeBitmap(ImageDecoder.createSource(file)))
+    return fromImage(ImageDecoder.decodeBitmap(ImageDecoder.createSource(ByteBuffer.wrap(file))))
 }
