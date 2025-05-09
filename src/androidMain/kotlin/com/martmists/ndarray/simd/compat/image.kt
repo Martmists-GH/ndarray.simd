@@ -3,6 +3,7 @@
 package com.martmists.ndarray.simd.compat
 
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import com.martmists.ndarray.simd.F64Array
 import com.martmists.ndarray.simd.F64Array.Companion.invoke
 import com.martmists.ndarray.simd.F64ImageArray
@@ -77,4 +78,32 @@ fun F64ImageArray.toBitmap(): Bitmap {
     }
 
     return bmp
+}
+
+/**
+ * Reads an image file into an [F64Array].
+ *
+ * The resulting [F64Array] will have shape `[width, height, 4]`,
+ *  where the 3rd dimension is in order RGBA. All values are in range `[0..1]`
+ *
+ * @param file The image file to read.
+ * @return The [F64Array] read from the image file.
+ * @since 1.7.0
+ */
+actual fun F64Array.Companion.fromImage(file: File): F64ImageArray {
+    return fromImage(ImageDecoder.decodeBitmap(ImageDecoder.createSource(file)))
+}
+
+/**
+ * Reads an image file into an [F64Array].
+ *
+ * The resulting [F64Array] will have shape `[width, height, 4]`,
+ *  where the 3rd dimension is in order RGBA. All values are in range `[0..1]`
+ *
+ * @param file The image bytes to read.
+ * @return The [F64Array] read from the image file.
+ * @since 1.7.0
+ */
+actual fun F64Array.Companion.fromImage(file: ByteArray): F64ImageArray {
+    return fromImage(ImageDecoder.decodeBitmap(ImageDecoder.createSource(file)))
 }

@@ -25,10 +25,37 @@ private fun Int.asColorDouble(): Double = (if (this < 0) 256 + this else this) /
  *
  * @param file The image file to read.
  * @return The [F64Array] read from the image file.
- * @since 1.4.0
+ * @since 1.4.0 (common with Android since 1.7.0)
  */
-fun F64Array.Companion.fromImage(file: File): F64ImageArray {
+actual fun F64Array.Companion.fromImage(file: File): F64ImageArray {
     val img = ImmutableImage.loader().fromFile(file)
+    val w = img.width
+    val h = img.height
+    val arr = F64Array(w, h, 4).image
+    for (y in 0 until h) {
+        for (x in 0 until w) {
+            val px = img.pixel(x, y)
+            arr[x, y, 0] = px.red().asColorDouble()
+            arr[x, y, 1] = px.green().asColorDouble()
+            arr[x, y, 2] = px.blue().asColorDouble()
+            arr[x, y, 3] = px.alpha().asColorDouble()
+        }
+    }
+    return arr
+}
+
+/**
+ * Reads an image file into an [F64Array].
+ *
+ * The resulting [F64Array] will have shape `[width, height, 4]`,
+ *  where the 3rd dimension is in order RGBA. All values are in range `[0..1]`
+ *
+ * @param file The image bytes to read.
+ * @return The [F64Array] read from the image file.
+ * @since 1.7.0
+ */
+actual fun F64Array.Companion.fromImage(file: ByteArray): F64ImageArray {
+    val img = ImmutableImage.loader().fromBytes(file)
     val w = img.width
     val h = img.height
     val arr = F64Array(w, h, 4).image
@@ -143,17 +170,22 @@ fun F64Array.Companion.fromImage(img: BufferedImage): F64ImageArray {
  */
 fun F64ImageArray.toBufferedImage(): BufferedImage {
     val hasAlpha = channels == 4
-    val img = BufferedImage(width, height, if (hasAlpha) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB)
-    val pxData = (img.raster.dataBuffer as DataBufferInt).data
+    val img = BufferedImage(width, height, if (hasAlpha) BufferedImage.TYPE_4BYTE_ABGR else BufferedImage.TYPE_3BYTE_BGR)
+    val pxData = (img.raster.dataBuffer as DataBufferByte).data
     val pxSize = if (hasAlpha) 4 else 3
     for (y in 0 until height) {
         for (x in 0 until width) {
             val idx = (x + y * width) * pxSize
-            var pxInt = if (hasAlpha) ((this[x, y, 3] * 255).toInt().coerceIn(0, 255) shl 24) else 0
-            pxInt = pxInt or ((this[x, y, 0] * 255).toInt().coerceIn(0, 255) shl 16)
-            pxInt = pxInt or ((this[x, y, 1] * 255).toInt().coerceIn(0, 255) shl 8)
-            pxInt = pxInt or ((this[x, y, 2] * 255).toInt().coerceIn(0, 255))
-            pxData[idx] = pxInt
+            if (hasAlpha) {
+                pxData[idx] = ((this[x, y, 3] * 255).toInt().coerceIn(0, 255)).toByte()
+                pxData[idx+1] = ((this[x, y, 2] * 255).toInt().coerceIn(0, 255)).toByte()
+                pxData[idx+2] = ((this[x, y, 1] * 255).toInt().coerceIn(0, 255)).toByte()
+                pxData[idx+3] = ((this[x, y, 0] * 255).toInt().coerceIn(0, 255)).toByte()
+            } else {
+                pxData[idx] = ((this[x, y, 2] * 255).toInt().coerceIn(0, 255)).toByte()
+                pxData[idx+1] = ((this[x, y, 1] * 255).toInt().coerceIn(0, 255)).toByte()
+                pxData[idx+2] = ((this[x, y, 0] * 255).toInt().coerceIn(0, 255)).toByte()
+            }
         }
     }
     return img
