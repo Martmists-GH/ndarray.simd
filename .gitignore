@@ -7,3 +7,5 @@ cmake-build-*/
 .kotlin/
 build/
 local.properties
+kotlin-js-store/
+lets-plot-images/

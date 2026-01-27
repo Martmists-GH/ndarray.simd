@@ -344,7 +344,11 @@ internal open class F64FlatArrayImpl internal constructor(
         }
         else -> {
             val sb = StringBuilder()
-            sb.append(truncate(this).toString().dropLast(2))
+            var dec = truncate(this).toString()
+            if ('.' in dec) {
+                dec = dec.dropLast(2)
+            }
+            sb.append(dec)
             val decimal = abs(this - truncate(this))
             if (decimal > 0) {
                 sb.append('.')
