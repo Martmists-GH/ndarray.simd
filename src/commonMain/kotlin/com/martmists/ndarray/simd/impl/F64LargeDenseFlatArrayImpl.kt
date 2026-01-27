@@ -80,7 +80,7 @@ internal class F64LargeDenseFlatArrayImpl(
             checkShape(other)
             NativeSpeedup.vecRemVec(data, offset, length, other.data, other.offset)
         } else {
-            super.divAssign(other)
+            super.remAssign(other)
         }
     }
     override fun remAssign(other: Double) = NativeSpeedup.vecRemScalar(data, offset, length, other)
