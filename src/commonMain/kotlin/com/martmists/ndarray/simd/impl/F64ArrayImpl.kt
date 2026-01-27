@@ -181,13 +181,19 @@ internal open class F64ArrayImpl internal constructor(
         return F64Array.create(data, offset, newStrides, newShape)
     }
 
-    override fun sum(): Double = unrollToFlat().map(F64FlatArray::sum).sum()
+    override fun sum(): Double = unrollToFlat().sumOf(F64FlatArray::sum)
 
-    override fun min(): Double = unrollToFlat().map(F64FlatArray::min).minOrNull() ?: Double.POSITIVE_INFINITY
+    override fun min(): Double = unrollToFlat().minOfOrNull(F64FlatArray::min) ?: Double.POSITIVE_INFINITY
 
-    override fun max(): Double = unrollToFlat().map(F64FlatArray::max).maxOrNull() ?: Double.NEGATIVE_INFINITY
+    override fun max(): Double = unrollToFlat().maxOfOrNull(F64FlatArray::max) ?: Double.NEGATIVE_INFINITY
 
-    override fun product(): Double = unrollToFlat().map(F64FlatArray::product).reduce(Double::times)
+    override fun product(): Double {
+        val seq = unrollToFlat()
+        val floats = seq.map {
+            it.product()
+        }
+        return floats.reduce(Double::times)
+    }
 
     override fun coerceInPlace(min: Double, max: Double) {
         unrollToFlat().forEach { it.coerceInPlace(min, max) }

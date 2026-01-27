@@ -179,6 +179,8 @@ internal open class F64FlatArrayImpl internal constructor(
         return res
     }
 
+    override fun product(): Double = reduce { acc, d -> acc * d }
+
     override fun transformInPlace(transform: (Double) -> Double) {
         for (pos in 0 until length) {
             unsafeSet(pos, transform.invoke(unsafeGet(pos)))
