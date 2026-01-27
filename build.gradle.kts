@@ -49,7 +49,10 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     jvm("desktop")
-    js(IR)
+    js(IR) {
+        browser()
+        nodejs()
+    }
 
     val natives = if (isProduction) {
         listOf(
