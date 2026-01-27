@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "com.martmists.ndarray-simd"
-version = "1.7.0"
+version = "1.7.1"
 val isProduction = (findProperty("production") ?: System.getProperty("production")) != null
 
 repositories {
@@ -49,6 +49,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     jvm("desktop")
+    js(IR)
 
     val natives = if (isProduction) {
         listOf(
@@ -303,6 +304,8 @@ kotlin {
 
                 implementation("com.sksamuel.scrimage:scrimage-core:4.1.3")
                 implementation("com.sksamuel.scrimage:scrimage-webp:4.1.3")
+
+                implementation("org.jetbrains.kotlinx:kandy-lets-plot:0.6.0")
             }
         }
 
