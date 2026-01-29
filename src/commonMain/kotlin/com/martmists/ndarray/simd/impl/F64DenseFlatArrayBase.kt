@@ -20,7 +20,7 @@ internal abstract class F64DenseFlatArrayBase(
     }
 
     override fun copyTo(other: F64Array) {
-        if (other is F64DenseFlatArrayBase) {
+        if (other is F64DenseFlatArrayBase && NativeSpeedup.getSimdAvailable()) {
             checkShape(other)
             NativeSpeedup.vecCopy(other.data, other.offset, length, data, offset)
         } else {
@@ -56,7 +56,7 @@ internal abstract class F64DenseFlatArrayBase(
             checkShape(other)
             if (offset == 0 && other.offset == 0) {
                 for (i in 0 until length) {
-                    this[i] = transform(data[i], other.data[i])
+                    data[i] = transform(data[i], other.data[i])
                 }
             } else {
                 var dstOffset = offset

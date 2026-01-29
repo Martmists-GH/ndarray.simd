@@ -1,10 +1,6 @@
 import com.martmists.ndarray.simd.F64Array
-import com.martmists.ndarray.simd.impl.F64LargeDenseFlatArrayImpl
 import com.martmists.ndarray.simd.impl.F64SmallDenseFlatArrayImpl
-import com.martmists.ndarray.simd.pow
-import kotlin.math.*
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class ProcedureTest {
@@ -55,5 +51,12 @@ class ProcedureTest {
         val arr2 = arr1.coerce(2.5, 17.0)
         assertEquals(2.5, arr2.min())
         assertEquals(17.0, arr2.max())
+    }
+
+    @Test
+    fun `Test Array copy`() {
+        val arr1 = F64Array.of(0.745, 0.745, 0.823, 1.0).reshape(2, 2)
+        val arr2 = arr1.copy()
+        assertEquals(arr1.neq(arr2).sum(), 0.0)
     }
 }
