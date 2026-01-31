@@ -3,6 +3,7 @@ import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.*
 import org.jetbrains.kotlin.konan.target.*
+import java.io.File
 import javax.inject.Inject
 import kotlin.reflect.*
 
@@ -41,7 +42,7 @@ abstract class KonanCompileTask @Inject constructor(
 
         workingDir(outputDirectory.get())
 
-        executable(provider.bundleDirectory.file("bin/run_konan").get().asFile.absolutePath)
+        executable(File(provider.bundleDirectory.get()).resolve("bin/run_konan").absolutePath)
         args("clang", "clang", konanTarget)
 
         args(files.map { it.absolutePath })

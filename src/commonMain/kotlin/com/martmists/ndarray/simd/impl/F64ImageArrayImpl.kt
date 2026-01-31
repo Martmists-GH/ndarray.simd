@@ -15,8 +15,6 @@ internal class F64ImageArrayImpl internal constructor(private val backing: F64Ar
     }
 
     override fun convertRGBtoHSV(): F64ImageArray {
-        require(channels == 3 || channels == 4) { "Image must have at least 3 channels" }
-
         return copy().apply {
             for (x in 0 until shape[0]) {
                 for (y in 0 until shape[1]) {
@@ -53,8 +51,6 @@ internal class F64ImageArrayImpl internal constructor(private val backing: F64Ar
     }
 
     override fun convertHSVtoRGB(): F64ImageArray {
-        require(channels == 3 || channels == 4) { "Image must have at least 3 channels" }
-
         return copy().apply {
             for (x in 0 until shape[0]) {
                 for (y in 0 until shape[1]) {

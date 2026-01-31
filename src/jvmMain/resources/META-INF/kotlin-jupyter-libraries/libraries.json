@@ -1,0 +1,5 @@
+{
+    "renderers": {
+        "com.martmists.ndarray.simd.compat.F64ArrayJupyterIntegration": {}
+    }
+}

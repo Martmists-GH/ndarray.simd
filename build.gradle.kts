@@ -2,6 +2,7 @@
 
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
@@ -50,6 +51,10 @@ kotlin {
     }
     jvm("desktop")
     js(IR) {
+        browser()
+        nodejs()
+    }
+    wasmJs {
         browser()
         nodejs()
     }
@@ -275,20 +280,23 @@ kotlin {
 
             dependencies {
                 // Compat: OpenCV
-                compileOnly("org.openpnp:opencv:4.9.0-0")
+                api("org.openpnp:opencv:4.9.0-0")
 
                 // Compat: Exposed+PGVector
-                compileOnly("com.pgvector:pgvector:0.1.6")
-                compileOnly("org.jetbrains.exposed:exposed-core:0.60.0")
+                api("com.pgvector:pgvector:0.1.6")
+                api("org.jetbrains.exposed:exposed-core:0.60.0")
 
                 // Compat: Langchain4J
-                compileOnly("dev.langchain4j:langchain4j:0.32.0")
+                api("dev.langchain4j:langchain4j:0.32.0")
 
                 // Compat: kotlinx.dataframe
-                compileOnly("org.jetbrains.kotlinx:dataframe-core:0.13.1")
+                api("org.jetbrains.kotlinx:dataframe-core:0.13.1")
 
                 // Compat: Deep Java Library
-                compileOnly("ai.djl:api:0.32.0")
+                api("ai.djl:api:0.32.0")
+
+                // Jupyter
+                api("org.jetbrains.kotlinx:kotlin-jupyter-api:0.17.2-813")
             }
         }
 
@@ -321,8 +329,8 @@ kotlin {
 
             dependencies {
                 // Compat: Image Formats
-                compileOnly("com.sksamuel.scrimage:scrimage-core:4.1.3")
-                compileOnly("com.sksamuel.scrimage:scrimage-webp:4.1.3")
+                api("com.sksamuel.scrimage:scrimage-core:4.1.3")
+                api("com.sksamuel.scrimage:scrimage-webp:4.1.3")
             }
         }
 
@@ -346,6 +354,12 @@ kotlin {
 
         val desktopTest by getting {
             dependsOn(jvmTest)
+        }
+
+        val wasmJsMain by getting {
+            dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+            }
         }
     }
 }

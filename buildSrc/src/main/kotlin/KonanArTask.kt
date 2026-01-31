@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.*
 import org.jetbrains.kotlin.konan.target.*
+import java.io.File
 import javax.inject.Inject
 import kotlin.reflect.*
 
@@ -44,7 +45,7 @@ abstract class KonanArTask @Inject constructor(
 
         workingDir(outputDirectory.get())
 
-        executable(provider.bundleDirectory.file("bin/run_konan").get().asFile.absolutePath)
+        executable(File(provider.bundleDirectory.get()).resolve("bin/run_konan").absolutePath)
         args("llvm", "llvm-ar", "r", outputFileName.get())
 
         args(files.map { it.absolutePath })
