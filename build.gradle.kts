@@ -194,7 +194,13 @@ kotlin {
                         "ssse3" -> arrayOf("-mssse3") + flagsFor("sse3")
 
                         // == ARM ==
-                        "neon64" -> arrayOf("-mfloat-abi=softfp", "-mfpu=neon")  // NEON is supposedly enabled by default?
+                        "neon64" -> {
+                            if ("Arm64" in this@apply.name) { // NEON is enabled by default on AArch64
+                                emptyArray()
+                            } else {
+                                arrayOf("-mfloat-abi=softfp", "-mfpu=neon")
+                            }
+                        }
                         else -> throw IllegalArgumentException("Unknown extension: $ext")
                     }
 
